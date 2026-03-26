@@ -1,175 +1,223 @@
 # Solomons Chamber
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Obsidian](https://img.shields.io/badge/Obsidian-Plugin-purple)]()
-[![Bun](https://img.shields.io/badge/Bun-Runtime-orange)]()
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)]
+[![Made with Bun](https://img.shields.io/badge/Made%20with-Bun-black?logo=bun)]
+[![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue?logo=typescript)]
 
-**A vault architecture for humans first, automation second.**
+**Personal AI Operating System**
 
-This template bridges your native Obsidian/PKM practice with agent-powered automation — without losing the human expression that makes thinking valuable.
-
----
-
-## Philosophy
-
-> "Text as the primary interface — automation amplifies, never replaces."
-
-Most PKM systems ask you to choose:
-- **Pure manual** (Obsidian native) — expressive but labor-intensive
-- **Pure automation** (AI agents) — productive but soulless
-
-**Solomons Chamber is the third path:**
-- Every day, you write in `05-Self-Notes/` — same as always
-- At end of day, run `bun scripts/daily-note.ts` — it organizes, tags, routes
-- Weekly, run `bun scripts/weekly-review.ts` — surfaces patterns, archives old work
-- Meanwhile, agents populate `01-Projects/` and `02-Research/` from external sources
-
-**You own the signal. The system handles noise.**
-
----
-
-## 7-Layer Architecture
-
-```
-Solomons-Chamber/
-├── 00-Inbox/           # Capture everything here first
-├── 01-Projects/        # AI-populated + your manual edits
-├── 02-Research/        # Auto-ingested + your insights
-├── 03-Trading/         # Signal/position tracking
-├── 04-Assets/          # Reusable skills, templates
-├── 05-Self-Notes/      # THE CORE — your daily writing
-├── 06-Media/           # Voice memos, transcripts, links
-└── 07-Archive/         # Completed work, auto-archived
-```
-
-**The Rule:** Everything in `05-Self-Notes/` is yours, always, forever. Automation never touches that folder without explicit permission.
+A vault architecture for thinkers, creators, and traders. 
+Gathers information, learns patterns, takes action, improves over time.
 
 ---
 
 ## Quick Start
 
-### 1. Create your chamber (GitHub UI)
-
-[Click this template button → Fork → Rename → Done]
-
-### 2. Initialize locally
-
 ```bash
+# Clone and setup
+git clone https://github.com/youngstunners88/Solomons-Chamber.git
 cd Solomons-Chamber
-bun install  # if you want TypeScript automation
-chmod +x scripts/*.ts
-```
 
-### 3. First day workflow
+# Install Bun runtime (once)
+curl -fsSL https://bun.sh/install | bash
 
-**Morning:**
-- Write in `05-Self-Notes/daily/2026-03-27.md`
-- Capture links in `00-Inbox/`
+# Set your vault path
+export VAULT_PATH=$(pwd)
 
-**Evening:**
-```bash
-bun scripts/daily-note.ts
-cat 05-Self-Notes/weekly/2026-W13.md
-```
-
-**When you archive in `00-Inbox/`, the router sorts automatically.**
-
----
-
-## Example Workflows
-
-### Minimal (Daily Writer)
-```
-05-Self-Notes/daily/   ← You write here (morning pages, ideas)
-07-Archive/             ← Moved after 7 days
-```
-*Everything else optional*
-
-### Trader (Signal Processing)
-```
-03-Trading/signals/   ← Auto-populated from API
-05-Self-Notes/daily/   ← Your context + analysis
-01-Projects/active/     ← Position tracking
-```
-
-### Researcher (Knowledge Synthesis)
-```
-02-Research/sources/    ← RSS feeds, bookmarks
-02-Research/insights/   ← Auto-extracted topics
-05-Self-Notes/         ← Your synthesis, connections
+# Create your first capture
+bun scripts/voice/capture.ts "first-memo"
 ```
 
 ---
 
-## Automation Scripts (Optional)
+## What This Is
 
-| Script | What it does |
-|--------|--------------|
-| `daily-note.ts` | Creates dated entry, runs routing |
-| `weekly-review.ts` | Archives old items, surfaces patterns |
-| `rss-ingest.ts` | Pulls feeds into `02-Research/sources/` |
-| `voice-capture.ts` | Records → transcribes → `06-Media/Transcripts/` |
-| `vault-router.ts` | Sorts `00-Inbox/` by content type |
+**Not a static note-taking app.** This is a living system that:
+- Gathers information **automatically**
+- Learns from **patterns**
+- Takes **action** on your behalf
+- **Improves itself** over time
 
-**None are required.** Your vault works as pure Markdown forever.
+It's a digital chamber where intelligence lives, grows, and works for you.
 
 ---
 
-## State Management
-
-Files have lifecycle:
+## The 10 Layers
 
 ```
-00-Inbox/ → (routed) → 01-Projects/active/ or 02-Research/topics/
-              ↓
-05-Self-Notes/weekly/ (reviews)
-              ↓
-07-Archive/ (auto after 30 days)
+00-Inbox/              — Capture everything here first
+01-Projects/           — Active work (with archived)
+02-Research/           — Topics, sources, insights
+03-Trading/            — Signals, positions, analysis
+04-Assets/             — Reusable skills, templates, adapters
+05-Self-Notes/         — Daily, weekly, reflections, journal
+06-Media/              — Audio, transcripts, links
+07-Archive/            — Done → move here
+08-Docs/               — How everything works
+09-Automation/         — Triggers, schedulers, watchers
+10-Skills/             — Installed capabilities (like voice-memo-system)
 ```
 
-**Status tracking:**
-- `#active` — Currently working
-- `#pending` — Scheduled
-- `#completed` — Done, ready for archive
-- `#archived` — Frozen, searchable
-
 ---
 
-## Integration: Obsidian Skills (Optional)
+## 🎙️ Voice Capture System
 
-This template **supplements** Obsidian Skills, *not replaces* them.
+One of the key features: **seamless voice memo integration**.
 
-**Obsidian Skills users can:**
-- Install Skills as usual in `.obsidian/plugins/`
-- Let `04-Assets/skills/` hold skill descriptions + config
-- Use `08-Plugins/obsidian-skills-bridge.ts` to sync data
-
-**The difference:**
-- **Obsidian Skills** = automation *inside* Obsidian
-- **Solomons Chamber** = vault architecture *for* humans + automation
-
-Use both. They're complementary.
-
----
-
-## Git Workflow
+### Quick Capture
 
 ```bash
-# Commit your notes daily
-git add 05-Self-Notes/
-git commit -m "Daily reflection: $(date +%Y-%m-%d)"
+# Full 5-minute capture with tags
+bun 10-Skills/voice-memo-system/scripts/capture.ts meeting,ideas,planning
 
-# Push weekly
-git push origin main
+# Quick 1-minute capture
+bun 10-Skills/voice-memo-system/scripts/capture.ts --quick
+
+# List recent memos
+bun 10-Skills/voice-memo-system/scripts/list.ts
+
+# Search transcripts
+bun 10-Skills/voice-memo-system/scripts/search.ts "claude code"
+
+# Add tags to existing memo
+bun 10-Skills/voice-memo-system/scripts/tag.ts "memo-2024-03-26" important
 ```
 
-**Private by default.** Never commit:
-- `03-Trading/signals/`
-- API keys (`.env` — already gitignored)
-- Voice memos (keep local)
+### CLI Integration
+
+**Claude Code:**
+```
+/voice capture meeting
+/voice quick
+/voice list
+/voice search "project"
+```
+
+**Cursor:**
+```
+@voice capture ideas,notes
+@voice quick
+@voice list
+```
+
+**OpenClaw / Codex:**
+```
+$voice capture
+$voice quick
+$voice search "keyword"
+```
+
+### How Voice Memos Work
+
+1. **Record** → `06-Media/Voice-Memos/Inbox/`
+2. **Transcribe** using Whisper → `06-Media/Voice-Memos/Processed/`
+3. **Tag** → Links created in `06-Media/Voice-Memos/tags/`
+4. **Link** → Cross-reference added to `05-Self-Notes/Daily/`
+5. **Archive** → Audio moved to `06-Media/Voice-Memos/Archived/`
+
+---
+
+## What's a Skill?
+
+Skills are **repeatable capabilities**. Example skills in `04-Assets/skills/`:
+
+- Check Bitcoin price every hour
+- Summarize unread emails
+- Track competitors on X
+- Alert when flights drop
+- Capture voice memos → transcribe → tag
+
+Each skill = one script + description. The system runs them.
+
+See `04-Assets/skills/template/` to create your first skill.
+
+---
+
+## Adapters
+
+Adapters connect external data to your vault:
+
+- **RSS feeds** → auto-ingested daily
+- **APIs** → structured and searchable
+- **Databases** → queried and analyzed
+- **Documents** → parsed and stored
+
+See `04-Assets/adapters/examples/` for templates.
+
+---
+
+## Is This a "Second Brain"?
+
+**Better.** A second brain remembers. This **acts**.
+
+Traditional second brain:
+- You save things
+- You organize things  
+- You retrieve things
+
+Solomons Chamber:
+- It **finds** things for you
+- It **organizes** itself
+- It takes action **while you sleep**
+
+---
+
+## Philosophy
+
+**Text as interface.** Everything is human-readable Markdown.
+
+**Files over apps.** No lock-in. No subscriptions. Fork it, modify it, own it.
+
+**Your data stays yours.** Local first. Private always.
+
+---
+
+## Requirements
+
+- [Bun](https://bun.sh/) runtime
+- Optional: `sox` for audio recording (`apt-get install sox`)
+- Optional: `whisper` for transcription
+- Optional: API keys for external data (stored in `.env`)
+
+---
+
+## Privacy First
+
+**Nothing sensitive in Git.** The `.gitignore` blocks:
+- Trading data & positions
+- API keys & tokens
+- Wallet addresses
+- Personal finances
+- All credentials
+
+Keep secrets in `.env` files (never committed).
+
+---
+
+## Structure at a Glance
+
+```
+00-Inbox/              → Today's thoughts, links, captures
+01-Projects/           → Active work with analysis & notes
+02-Research/           → Deep research with sources
+03-Trading/            → Live market data & signals
+04-Assets/skills/      → Reusable automations
+04-Assets/templates/   → Starting points for new notes
+04-Assets/adapters/    → External data connectors
+05-Self-Notes/daily/   → Daily reflections
+05-Self-Notes/weekly/  → Weekly reviews
+05-Self-Notes/journal/ → Personal journal
+06-Media/Audio/        → Voice recordings
+06-Media/Transcripts/  → Whisper transcriptions
+06-Media/Links/        → Saved URLs with metadata
+07-Archive/            → Completed projects
+08-Docs/               → Documentation & guides
+09-Automation/         → Scripts that run on schedule
+10-Skills/             → Installed capability modules
+```
 
 ---
 
 ## License
 
-MIT — Use it, fork it, make it yours. Keep the human-first principle.
+MIT — Make it yours

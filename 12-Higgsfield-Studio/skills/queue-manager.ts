@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const QUEUE_PATH = join(VAULT_PATH, "12-Higgsfield-Studio/Queue");
 
 interface Job {

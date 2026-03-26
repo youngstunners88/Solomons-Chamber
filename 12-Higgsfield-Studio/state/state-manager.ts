@@ -108,7 +108,7 @@ ${Array.from(this.jobs.values())
 }
 
 // CLI
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const manager = new StateManager(VAULT_PATH);
 const args = process.argv.slice(2);
 

@@ -10,7 +10,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-Template";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 
 interface MediaLink {
   url: string;

@@ -9,7 +9,7 @@
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const AUDIO_PATH = join(VAULT_PATH, "06-Media", "Audio", "Voice-Memos", "Inbox");
 
 // Ensure directory exists

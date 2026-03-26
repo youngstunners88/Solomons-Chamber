@@ -43,7 +43,7 @@ export default function activate(api: CodexAPI) {
       case "list": {
         const { readdirSync } = await import("fs");
         const { join } = await import("path");
-        const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+        const vaultPath = process.env.VAULT_PATH || ".";
         const memosPath = join(vaultPath, "06-Media/Voice-Memos/Processed");
         
         const files = readdirSync(memosPath)
@@ -59,7 +59,7 @@ export default function activate(api: CodexAPI) {
         const query = restArgs.join(" ");
         const { readdirSync, readFileSync } = await import("fs");
         const { join } = await import("path");
-        const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+        const vaultPath = process.env.VAULT_PATH || ".";
         const memosPath = join(vaultPath, "06-Media/Voice-Memos/Processed");
         
         const files = readdirSync(memosPath).filter(f => f.endsWith(".md"));

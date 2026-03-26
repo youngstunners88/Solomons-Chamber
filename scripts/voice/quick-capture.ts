@@ -12,7 +12,7 @@ import { execSync } from "child_process";
 import { existsSync, mkdirSync, writeFileSync, renameSync } from "fs";
 import { join } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const VOICE_MEMOS_PATH = join(VAULT_PATH, "06-Media/Voice-Memos");
 
 interface CaptureConfig {

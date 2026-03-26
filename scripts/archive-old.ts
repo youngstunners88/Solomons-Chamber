@@ -14,7 +14,7 @@ function daysSince(dateStr: string): number {
 }
 
 async function archiveOldNotes(daysThreshold: number = 90): Promise<void> {
-  const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-Template";
+  const vaultPath = process.env.VAULT_PATH || ".";
   const vault = new Vault(vaultPath);
   
   console.log(`📦 Archiving notes older than ${daysThreshold} days...\n`);

@@ -35,7 +35,7 @@ export function activate(context: CursorPluginAPI) {
   context.registerCommand("voice.list", async () => {
     const { readdirSync } = await import("fs");
     const { join } = await import("path");
-    const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+    const vaultPath = process.env.VAULT_PATH || ".";
     const memosPath = join(vaultPath, "06-Media/Voice-Memos/Processed");
     
     const files = readdirSync(memosPath)
@@ -52,7 +52,7 @@ export function activate(context: CursorPluginAPI) {
     // Simple search implementation
     const { readdirSync, readFileSync } = await import("fs");
     const { join } = await import("path");
-    const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+    const vaultPath = process.env.VAULT_PATH || ".";
     const memosPath = join(vaultPath, "06-Media/Voice-Memos/Processed");
     
     const files = readdirSync(memosPath).filter(f => f.endsWith(".md"));

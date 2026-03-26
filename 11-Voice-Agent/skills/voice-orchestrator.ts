@@ -8,7 +8,7 @@
  *        bun voice-orchestrator.ts --query "what did I capture yesterday"
  */
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const LOCALE = process.env.VOICE_LOCALE || "en";
 
 interface VoiceCommand {

@@ -26,7 +26,7 @@ class HiggsfieldSkill {
   private apiKey: string;
 
   constructor() {
-    this.vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+    this.vaultPath = process.env.VAULT_PATH || ".";
     this.apiKey = process.env.HIGGSFIELD_API_KEY || "";
   }
 

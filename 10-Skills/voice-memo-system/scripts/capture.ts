@@ -10,7 +10,7 @@ import { execSync, spawn } from "child_process";
 import { existsSync, mkdirSync, writeFileSync, renameSync, appendFileSync } from "fs";
 import { join, basename } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const VOICE_MEMOS_PATH = join(VAULT_PATH, "06-Media/Voice-Memos");
 const WHISPER_CMD = process.env.WHISPER_CMD || "whisper";
 

@@ -52,7 +52,7 @@ async function fetchRSS(url: string): Promise<Array<{title: string, link: string
 }
 
 async function ingestFeeds(): Promise<void> {
-  const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-Template";
+  const vaultPath = process.env.VAULT_PATH || ".";
   const vault = new Vault(vaultPath);
   
   console.log("🔍 Ingesting RSS feeds...\n");

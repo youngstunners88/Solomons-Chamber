@@ -8,7 +8,7 @@
 import { mkdirSync, existsSync } from "fs";
 import { join } from "path";
 
-const BASE_PATH = "/home/workspace/Solomons-Chamber-Template";
+const BASE_PATH = process.env.VAULT_PATH || ".";
 
 console.log("🏛️  Solomon's Chamber - Quick Start\n");
 

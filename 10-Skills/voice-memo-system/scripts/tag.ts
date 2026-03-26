@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "fs";
 import { join } from "path";
 
-const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const VAULT_PATH = process.env.VAULT_PATH || ".";
 const PROCESSED_PATH = join(VAULT_PATH, "06-Media/Voice-Memos/Processed");
 const TAGS_PATH = join(VAULT_PATH, "06-Media/Voice-Memos/tags");
 

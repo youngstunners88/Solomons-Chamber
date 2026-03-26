@@ -36,6 +36,27 @@ The best part is the 05-Self-Notes folder. The scripts just tidy up.
 10-Skills/        — Installed skill library
 ```
 
+## Who Is This For?
+
+- **Traders** — Capture observations, track positions, document strategies  
+- **Researchers** — Ingest papers, build knowledge bases, connect ideas  
+- **Builders** — Track projects, log experiments, learn from outcomes  
+- **Thinkers** — Daily notes, weekly reviews, long-term thinking  
+
+**Age:** Any. If you can write and use a computer, you can use this.
+
+[📖 See full onboarding guide →](docs/onboarding/WHO_IT_IS_FOR.md)
+
+## 📱 Mobile & Tablet
+
+Yes, it works on phones and tablets.
+
+- **iOS:** Obsidian + Git plugin, or Working Copy + iA Writer
+- **Android:** MGit + Markor, or Termux for full power
+- **Web:** github.dev for browser-based editing
+
+[📱 Mobile setup guide →](docs/onboarding/MOBILE_TABLET_GUIDE.md)
+
 ## Quick Start
 
 ```bash

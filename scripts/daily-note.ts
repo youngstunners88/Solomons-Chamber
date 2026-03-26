@@ -1,71 +1,53 @@
 #!/usr/bin/env bun
 /**
- * Daily Note Creator
- * Generates today's note with template
+ * Daily Note Generator
+ * Creates a formatted daily note in 05-Self-Notes/daily/
+ * 
+ * Usage: bun scripts/daily-note.ts [optional-title]
  */
 
-import { Vault } from "./lib/vault.ts";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
 
-function getDailyTemplate(date: Date): string {
-  const dateStr = date.toLocaleDateString("en-US", {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric"
-  });
-  
-  return `# Daily Note: ${dateStr}
+const VAULT_PATH = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-V2";
+const DAILY_PATH = join(VAULT_PATH, "05-Self-Notes", "daily");
 
-## 🎯 Today's Intentions
+// Ensure directory exists
+if (!existsSync(DAILY_PATH)) {
+  mkdirSync(DAILY_PATH, { recursive: true });
+}
 
-1. 
-2. 
-3. 
+const today = new Date();
+const dateStr = today.toISOString().split("T")[0];
+const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
 
-## 📝 Notes & Ideas
+const title = process.argv[2] || `${weekday}'s Intentions`;
+const filename = `${dateStr}-${title.toLowerCase().replace(/\s+/g, "-")}.md`;
+const filepath = join(DAILY_PATH, filename);
 
-- 
+const template = `---
+date: ${dateStr}
+day: ${weekday}
+tags: [daily, intentions]
+---
 
-## 🔗 Connections
+# ${title}
 
-Links to yesterday: [[Yesterday's Note]]
-
-## ✅ Completed
-
+## 🎯 Today's Focus
 - [ ] 
 
-## 💭 Reflections
+## 📝 Notes & Thoughts
 
-> What went well?
-> 
-> What could improve?
+
+## ✅ Wins (End of Day)
+
+
+## 🔄 Tomorrow's Seeds
+
 
 ---
-*Created: ${date.toISOString()}*
+*Created: ${today.toISOString()}*
 `;
-}
 
-async function createDailyNote(): Promise<void> {
-  const vaultPath = process.env.VAULT_PATH || "/home/workspace/Solomons-Chamber-Template";
-  const vault = new Vault(vaultPath);
-  const today = new Date();
-  
-  // Check if note already exists
-  const existing = vault.readFolder("05-Self-Notes/daily/");
-  const todayStr = today.toISOString().split("T")[0];
-  const alreadyExists = existing.some(n => n.filename.startsWith(todayStr));
-  
-  if (alreadyExists) {
-    console.log("Daily note already exists for today");
-    return;
-  }
-  
-  const content = getDailyTemplate(today);
-  const path = vault.createNote("05-Self-Notes/daily/", `Daily-${todayStr}`, content);
-  
-  console.log(`✅ Created: ${path}`);
-}
-
-if (import.meta.main) {
-  createDailyNote();
-}
+writeFileSync(filepath, template);
+console.log(`✅ Created: ${filepath}`);

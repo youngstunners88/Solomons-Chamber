@@ -1,0 +1,23 @@
+# NEVER commit these
+.env
+*.log
+05-Self-Notes/private/
+03-Trading/positions/*[0-9]*-*
+03-Trading/signals/*[0-9]*-*
+
+# Allow templates only in trading
+!03-Trading/*/TEMPLATE-*.md
+
+# Node
+node_modules/
+*.lock
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*~

@@ -1,0 +1,33 @@
+{
+  "name": "solomons-chamber",
+  "version": "1.0.0",
+  "description": "Personal AI Operating System with REST API and Web Dashboard",
+  "main": "core/server.ts",
+  "scripts": {
+    "dev": "bun run --hot core/server.ts",
+    "start": "bun run core/server.ts",
+    "api": "bun run core/api.ts",
+    "web": "bun run web/src/app.tsx",
+    "test": "bun test tests/*.test.ts",
+    "status": "bun run scripts/status.ts",
+    "capture": "bun run scripts/voice-capture.ts",
+    "daily": "bun run scripts/daily-note.ts"
+  },
+  "dependencies": {
+    "hono": "^3.12.0",
+    "@hono/node-server": "^1.8.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.3.0"
+  },
+  "peerDependencies": {
+    "bun": ">=1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/youngstunners88/Solomons-Chamber"
+  },
+  "author": "youngstunners88",
+  "license": "MIT"
+}

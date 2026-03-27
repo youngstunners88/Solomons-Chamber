@@ -1,157 +1,92 @@
 # Solomons Chamber
 
-> **First and foremost: a place to think, write, and express yourself.**  
-> The automation? That's just a helpful assistant that lives nearby.
+A folder-based note-taking system. Write in Markdown. Organize with files.
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Made with Bun](https://img.shields.io/badge/Made%20with-Bun-black?logo=bun)](https://bun.sh)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue?logo=typescript)](https://typescriptlang.org)
-[![Obsidian Compatible](https://img.shields.io/badge/Obsidian-Compatible-7c3aed)](https://obsidian.md)
-[![Multilingual Voice](https://img.shields.io/badge/Voice-22%20Languages-green)](11-Voice-Agent/)
+## What Actually Works Today
 
-## What This Is
+**📝 Daily Notes** — `bun scripts/daily-note.ts "title"`  
+Creates a dated Markdown file in `05-Self-Notes/daily/`
 
-**Primarily:** A digital space for your thoughts.
+**📊 Status Dashboard** — `bun scripts/status.ts`  
+Shows how many notes you have and quick commands to run
 
-**Secondarily:** A living system that gathers, learns, and acts.
+**🔗 Link Capture** — `bun scripts/media-link-capture.ts "URL"`  
+Saves a URL with metadata to `06-Media/Links/`
 
-**Think of it as:** Your private chamber where ideas live, grow, and work for you — with optional AI superpowers.
+**🎙️ Voice Memo Stub** — `bun scripts/voice-capture.ts`  
+Creates a Markdown template in `06-Media/Audio/Voice-Memos/Inbox/`  
+*(Does NOT record audio — you transcribe manually or provide your own Whisper setup)*
 
-## 🔬 Live Example
+**🚀 One-Command Setup** — `bash ONE-CLICK-SETUP.sh`  
+Clones, installs Bun if needed, creates your first note
 
-**This vault is actively used by its creator for:**
-- [TurboQuant research](https://github.com/youngstunners88/Obsidian-Personal-Vault/tree/main/TurboQuant) — AI efficiency papers
-- [Better Zillow analysis](https://github.com/youngstunners88/Obsidian-Personal-Vault/tree/main/Better-Zillow) — Real estate market research  
-- Daily trading signals & voice memos
+## Quick Start
 
-*See the real vault in action: [Obsidian-Personal-Vault](https://github.com/youngstunners88/Obsidian-Personal-Vault)*
-
-## The Core Rule
-
-**Human expression first. Automation second.**
-
-The best part is the **05-Self-Notes** folder. The 22-language voice agent and AI media studio? Just helpful assistants.
-
-## 📸 System in Action
-
-### Voice Memo Flow
-```
-Record (any device) → Inbox → Transcribe → Tag → Archive
-     "Morning thoughts"     → 00-Inbox/ → Whisper → 06-Media/tags/ → Done
-```
-
-### AI Media Generation (12-Higgsfield-Studio)
-```
-Text prompt → Higgsfield → Generated asset → Routed to project
-"African sunset"  →  bun generate.ts  →  sunset.png  →  01-Projects/active/
-```
-
-## Directory Structure
-
-```
-00-Inbox/              — Capture everything here first
-01-Projects/           — Active work (active/, archived/)
-02-Research/           — Topics, sources, insights
-03-Trading/            — Signals, positions, analysis
-04-Assets/             — Skills, templates, adapters
-05-Self-Notes/ ⭐      — THE MOST IMPORTANT FOLDER
-06-Media/              — Voice memos, transcripts, images, videos
-07-Archive/            — Cold storage
-08-Docs/               — Documentation
-09-Automation/         — Triggers, schedulers
-10-Skills/             — Installed skill library
-11-Voice-Agent/        — 🎙️ Voice commands in 22 languages
-12-Higgsfield-Studio/  — 🎬 AI image/video/lip-sync generation
-```
-
-## Who Is This For?
-
-- **Traders** — Capture observations, voice memos, track positions
-- **Researchers** — Ingest papers, build knowledge bases  
-- **Creators** — AI media generation, multilingual voice capture
-- **Thinkers** — Daily notes, weekly reviews, long-term thinking
-
-[📖 See full onboarding →](docs/onboarding/WHO_IT_IS_FOR.md)
-
-## 📱 Mobile & Tablet
-
-- **iOS:** Obsidian + Git plugin, Working Copy + iA Writer
-- **Android:** MGit + Markor, Termux for full power
-- **Web:** github.dev for browser editing
-
-[📱 Mobile setup →](docs/onboarding/MOBILE_TABLET_GUIDE.md)
-
-## 🚀 Quick Start (3 Paths)
-
-### Path 1: The Minimalist (30 seconds)
 ```bash
-# Clone
-git clone https://github.com/youngstunners88/Solomons-Chamber.git
-cd Solomons-Chamber/05-Self-Notes/daily
+# One command to get started
+bash ONE-CLICK-SETUP.sh
 
-# Create today's note
-touch "$(date +%Y-%m-%d)-thoughts.md"
-
-# Write. That's it.
-```
-
-### Path 2: The Builder (2 minutes)
-```bash
-# Clone & setup
+# Or manually:
 git clone https://github.com/youngstunners88/Solomons-Chamber.git
 cd Solomons-Chamber
-
-# Install Bun (once)
-curl -fsSL https://bun.sh/install | bash
-
-# Create daily note
 bun scripts/daily-note.ts
-
-# Try voice capture
-bun scripts/voice-capture.ts ideas,planning
-
-# Run tests
-bun tests/living-rounds.ts
 ```
 
-### Path 3: The Automator (Explore all layers)
-```bash
-# Voice agent in 22 languages
-cd 11-Voice-Agent
-ls locales/  # en, es, pt, zu, af, it, nl, ru, ko, tr, pl, id, vi, th, bn...
+## Directory Structure (What It Is)
 
-# AI media generation
-cd 12-Higgsfield-Studio
-ls skills/   # generate.ts, video.ts, lipsync.ts
-
-# Explore all skills
-ls 10-Skills/
+```
+00-Inbox/              — Random stuff you haven't organized yet
+01-Projects/active/    — Things you're actively working on
+02-Research/           — Topics you're learning about  
+03-Trading/            — Market notes (if you trade)
+04-Assets/             — Templates and reusable bits
+05-Self-Notes/daily/   — ⭐ Daily notes go here
+06-Media/              — Voice memos (stubs), links, transcripts
+07-Archive/            — Old completed stuff
+08-Docs/               — Documentation
+09-Automation/         — Hooks for scheduling (empty)
+10-Skills/             — Skill library (mostly scaffolding)
 ```
 
-## 🎙️ Voice Memos (Real Examples)
+## What This Is NOT
 
-Created by the developer and stored in vault:
-- `06-Media/Voice-Memos/Inbox/voice-memo-2026-03-26-182733.oga`
-- `06-Memo-2026-03-26-183156.oga`
+- ❌ **NOT a full "second brain"** — It makes files. You organize them.
+- ❌ **NOT automated** — Scripts create templates; you fill them in
+- ❌ **NOT an Obsidian replacement** — No backlinks, no graph view, no plugins
+- ❌ **NOT production-ready** — Some scripts reference files that don't exist yet
 
-## Features Matrix
+## What's Actually Implemented vs TODO
 
-| Feature | What It Does | Status |
-|---------|-------------|--------|
-| **Voice ➜ Vault** | Record → transcribe → tag → archive | ✅ Live |
-| **22-Language Voice** | Voice commands in 22 languages | ✅ Live |
-| **AI Media Studio** | Image/video/lip-sync generation | ✅ Live |
-| **Live Data** | RSS, API, DB adapters | ✅ Live |
-| **Mobile Sync** | iOS/Android + Obsidian | ✅ Live |
+| Feature | Status | Reality |
+|---------|--------|---------|
+| Daily notes | ✅ Works | Creates Markdown files |
+| Status dashboard | ✅ Works | Counts files, shows stats |
+| Link capture | ✅ Works | Saves URLs with metadata |
+| Voice memos | ⚠️ Partial | Creates stubs only, no recording |
+| Archive old notes | ❌ Broken | Needs vault.ts library |
+| RSS ingestion | ❌ Broken | Needs vault.ts library |
+| Voice processing | ❌ Stub | Console messages, no real audio |
+| Social sharing | ❌ Stub | README only |
+| Multi-channel bots | ❌ Stub | README only |
+
+See [ROADMAP.md](ROADMAP.md) for the vision vs reality.
 
 ## Philosophy
 
-Expression over automation.  
-Thinking over optimizing.  
-Your words over algorithms.
+**Human expression first.**  
+This system makes files. You write in them. That's it.
 
-**But when you want automation:** It's here, local-first, and speaks 22 languages.
+**Automation is optional.**  
+The scripts save you 30 seconds of `touch` and `cat`. They're helpers, not magic.
+
+**Text files over apps.**  
+Markdown in folders. No lock-in. No cloud. If GitHub dies tomorrow, you still have your notes.
+
+## Requirements
+
+- Git
+- [Bun](https://bun.sh/) (auto-installed by ONE-CLICK-SETUP.sh if missing)
 
 ## License
 
-MIT — Make it yours. Write in it. Automate if you want.
+MIT — Do what you want. Keep it honest.

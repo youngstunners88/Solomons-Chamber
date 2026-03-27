@@ -1,0 +1,33 @@
+# ComfyUI Configuration
+base_url: http://localhost:8188
+
+paths:
+  install_dir: ~/ComfyUI
+  checkpoints: ~/ComfyUI/models/checkpoints
+  output: ~/ComfyUI/output
+  workflows: ~/skills/local-ai-image/workflows
+
+defaults:
+  workflow: sdxl_basic
+  width: 1024
+  height: 1024
+  steps: 30
+  cfg: 7.5
+
+timeout:
+  connect: 30
+  generation: 300
+  poll_interval: 1.0
+
+workflows:
+  sdxl_basic: "Standard SDXL pipeline"
+  sdxl_upscale: "SDXL + 4x upscaler"
+  flux_basic: "Flux schnell pipeline"
+  img2img_basic: "Basic image-to-image"
+  img2img_controlnet: "Image-to-image with ControlNet"
+  inpainting: "Masked inpainting"
+
+models:
+  sdxl: "sdxl_base_1.0.safetensors"
+  flux: "flux1-schnell.safetensors"
+  sd15: "v1-5-pruned-emaonly.safetensors"

@@ -1,0 +1,22 @@
+# LocalAI Configuration
+base_url: http://localhost:8080
+api_key: sk-local
+
+models:
+  sdxl: stabilityai/stable-diffusion-xl-base-1.0
+  sdxl-turbo: stabilityai/sdxl-turbo
+  flux: black-forest-labs/FLUX.1-schnell
+  sd15: runwayml/stable-diffusion-v1-5
+  sd21: stabilityai/stable-diffusion-2-1
+
+defaults:
+  width: 1024
+  height: 1024
+  steps: 30
+  cfg_scale: 7.5
+
+negative_prompt: "blurry, low quality, distorted, watermark, signature, text, cropped"
+
+output:
+  format: "png"
+  quality: 95

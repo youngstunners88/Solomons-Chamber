@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2026-03-27T14:39:18.664Z",
+  "session": {
+    "startedAt": "2026-03-27T14:39:18.664Z",
+    "commandsRun": 0,
+    "activeLayer": null
+  },
+  "layers": {
+    "storychain": {
+      "lastVisited": null,
+      "activeStories": 0,
+      "totalContributions": 0,
+      "url": "http://104.198.196.174:3000/"
+    },
+    "higgsfield": {
+      "queuedJobs": 0,
+      "completedJobs": 0,
+      "lastGeneration": null
+    },
+    "voice": {
+      "totalMemos": 0,
+      "lastCapture": null,
+      "pendingTranscriptions": 0
+    },
+    "projects": {
+      "active": 2,
+      "archived": 0,
+      "lastUpdated": "2026-03-27T14:39:18.664Z"
+    },
+    "inbox": {
+      "unprocessed": 0,
+      "lastCapture": null
+    }
+  },
+  "recentActivity": []
+}

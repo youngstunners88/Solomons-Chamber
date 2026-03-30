@@ -1,0 +1,42 @@
+{
+  "name": "goals-protocol-contracts",
+  "version": "1.0.0",
+  "description": "$GOALS Protocol - Dynamic NFT Smart Contracts with Autonomous Agents",
+  "scripts": {
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "deploy": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:local": "hardhat run scripts/deploy.js --network hardhat",
+    "deploy:testnet": "hardhat run scripts/deploy.js --network baseSepolia",
+    "deploy:mainnet": "hardhat run scripts/deploy.js --network baseMainnet",
+    "mint:test": "hardhat run scripts/mint-test.js --network baseSepolia",
+    "update:stats": "hardhat run scripts/update-stats.js --network baseSepolia",
+    "verify": "hardhat verify --network baseSepolia",
+    "bot:deploy": "node scripts/auto-deploy-bot.js",
+    "bot:monitor": "node scripts/faucet-monitor.js",
+    "bot:fund": "node scripts/eth-faucet-bot.js",
+    "bot:fund-and-deploy": "npm run bot:fund && npm run deploy"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-chai-matchers": "^2.1.2",
+    "@nomicfoundation/hardhat-ethers": "^3.1.3",
+    "@nomicfoundation/hardhat-network-helpers": "^1.1.2",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-verify": "^2.1.3",
+    "@openzeppelin/contracts": "^4.9.3",
+    "@typechain/ethers-v6": "^0.5.1",
+    "@typechain/hardhat": "^9.1.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^25.5.0",
+    "chai": "^4.5.0",
+    "dotenv": "^16.6.1",
+    "ethers": "^6.16.0",
+    "hardhat": "^2.19.0",
+    "hardhat-gas-reporter": "^1.0.10",
+    "open": "^8.4.2",
+    "solidity-coverage": "^0.8.17",
+    "ts-node": "^10.9.2",
+    "typechain": "^8.3.2",
+    "typescript": "^6.0.2"
+  }
+}

@@ -1,0 +1,1902 @@
+{
+  "network": "hardhat",
+  "chainId": 31337,
+  "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "deployerAddress": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "deploymentTime": "2026-03-29T11:16:01.983Z",
+  "config": {
+    "royaltyRecipient": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "dataOracle": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "baseURI": "https://api.goalsprotocol.xyz/metadata/"
+  },
+  "abi": [
+    {
+      "type": "constructor",
+      "stateMutability": "undefined",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_royaltyRecipient"
+        },
+        {
+          "type": "address",
+          "name": "_dataOracle"
+        },
+        {
+          "type": "address",
+          "name": "_agentRegulator"
+        },
+        {
+          "type": "string",
+          "name": "_baseURI"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AchievementUnlocked",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "achievement",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AgentDegraded",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "reason",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AgentDisabled",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AgentEnabled",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "agentWallet",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AgentRecovered",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "resolution",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Approval",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "approved",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "ApprovalForAll",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "operator",
+          "indexed": true
+        },
+        {
+          "type": "bool",
+          "name": "approved",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "AutoRemediation",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "issue",
+          "indexed": false
+        },
+        {
+          "type": "string",
+          "name": "action",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "BatchMetadataUpdate",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_fromTokenId",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "_toTokenId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "CardBoosted",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "boostEndTime",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "DiagnosticsReported",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "issue",
+          "indexed": false
+        },
+        {
+          "type": "bool",
+          "name": "autoResolved",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "MatchPlayed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "bool",
+          "name": "won",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "goals",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "assists",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "MetadataUpdate",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "OwnershipTransferred",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "previousOwner",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "newOwner",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Paused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "PlayerMinted",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "owner",
+          "indexed": true
+        },
+        {
+          "type": "string",
+          "name": "playerName",
+          "indexed": false
+        },
+        {
+          "type": "uint8",
+          "name": "rarity",
+          "indexed": false
+        },
+        {
+          "type": "uint256",
+          "name": "price",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "SelfCheckPerformed",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "uint8",
+          "name": "health",
+          "indexed": false
+        },
+        {
+          "type": "bool",
+          "name": "issuesFound",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "StatsUpdated",
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        },
+        {
+          "type": "tuple",
+          "name": "newStats",
+          "indexed": false,
+          "components": [
+            {
+              "type": "uint256",
+              "name": "distanceCovered"
+            },
+            {
+              "type": "uint16",
+              "name": "sprints"
+            },
+            {
+              "type": "uint16",
+              "name": "topSpeed"
+            },
+            {
+              "type": "uint8",
+              "name": "fatigueLevel"
+            },
+            {
+              "type": "uint16",
+              "name": "passesCompleted"
+            },
+            {
+              "type": "uint8",
+              "name": "shotsOnTarget"
+            },
+            {
+              "type": "uint8",
+              "name": "goals"
+            },
+            {
+              "type": "uint8",
+              "name": "assists"
+            },
+            {
+              "type": "uint256",
+              "name": "lastUpdate"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Transfer",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "from",
+          "indexed": true
+        },
+        {
+          "type": "address",
+          "name": "to",
+          "indexed": true
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId",
+          "indexed": true
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "anonymous": false,
+      "name": "Unpaused",
+      "inputs": [
+        {
+          "type": "address",
+          "name": "account",
+          "indexed": false
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "BOOST_DURATION",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_CONSECUTIVE_ERRORS",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_MINT_PER_TX",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_SELF_CHECK_INTERVAL",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MAX_SUPPLY_LIMIT",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "MIN_SELF_CHECK_INTERVAL",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "ROYALTY_PERCENTAGE",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "agentDiagnostics",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": "timestamp"
+        },
+        {
+          "type": "string",
+          "name": "issue"
+        },
+        {
+          "type": "string",
+          "name": "resolution"
+        },
+        {
+          "type": "bool",
+          "name": "autoResolved"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "agentRegulator",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "approve",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "to"
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "authorizedMinters",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "authorizedUpdaters",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "balanceOf",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "baseExtension",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "baseURI",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "batchSelfCheck",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256[]",
+          "name": "_tokenIds"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "burn",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "currentSupply",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "dataOracle",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "disableAgent",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "enableAgent",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "address",
+          "name": "_agentWallet"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "forceAgentRecovery",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "string",
+          "name": "_reason"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "getAgentDiagnostics",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple[]",
+          "name": "",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "timestamp"
+            },
+            {
+              "type": "string",
+              "name": "issue"
+            },
+            {
+              "type": "string",
+              "name": "resolution"
+            },
+            {
+              "type": "bool",
+              "name": "autoResolved"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getAgentHealth",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getApproved",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTokenData",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "tuple",
+          "name": "",
+          "components": [
+            {
+              "type": "string",
+              "name": "playerName"
+            },
+            {
+              "type": "uint8",
+              "name": "position"
+            },
+            {
+              "type": "uint8",
+              "name": "rarity"
+            },
+            {
+              "type": "tuple",
+              "name": "baseStats",
+              "components": [
+                {
+                  "type": "uint16",
+                  "name": "pace"
+                },
+                {
+                  "type": "uint16",
+                  "name": "shooting"
+                },
+                {
+                  "type": "uint16",
+                  "name": "passing"
+                },
+                {
+                  "type": "uint16",
+                  "name": "dribbling"
+                },
+                {
+                  "type": "uint16",
+                  "name": "defense"
+                },
+                {
+                  "type": "uint16",
+                  "name": "physical"
+                },
+                {
+                  "type": "uint16",
+                  "name": "overall"
+                },
+                {
+                  "type": "uint256",
+                  "name": "lastUpdate"
+                }
+              ]
+            },
+            {
+              "type": "tuple",
+              "name": "liveStats",
+              "components": [
+                {
+                  "type": "uint256",
+                  "name": "distanceCovered"
+                },
+                {
+                  "type": "uint16",
+                  "name": "sprints"
+                },
+                {
+                  "type": "uint16",
+                  "name": "topSpeed"
+                },
+                {
+                  "type": "uint8",
+                  "name": "fatigueLevel"
+                },
+                {
+                  "type": "uint16",
+                  "name": "passesCompleted"
+                },
+                {
+                  "type": "uint8",
+                  "name": "shotsOnTarget"
+                },
+                {
+                  "type": "uint8",
+                  "name": "goals"
+                },
+                {
+                  "type": "uint8",
+                  "name": "assists"
+                },
+                {
+                  "type": "uint256",
+                  "name": "lastUpdate"
+                }
+              ]
+            },
+            {
+              "type": "uint256",
+              "name": "mintTimestamp"
+            },
+            {
+              "type": "uint256",
+              "name": "matchesPlayed"
+            },
+            {
+              "type": "address",
+              "name": "agentWallet"
+            },
+            {
+              "type": "bool",
+              "name": "agentEnabled"
+            },
+            {
+              "type": "string",
+              "name": "dynamicImageURI"
+            },
+            {
+              "type": "uint8",
+              "name": "agentHealth"
+            },
+            {
+              "type": "uint256",
+              "name": "lastSelfCheck"
+            },
+            {
+              "type": "uint256",
+              "name": "consecutiveErrors"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "getTokensByOwner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_owner"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256[]",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "isAgentHealthy",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "isApprovedForAll",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner"
+        },
+        {
+          "type": "address",
+          "name": "operator"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "maxSupply",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "mintPlayer",
+      "constant": false,
+      "stateMutability": "payable",
+      "payable": true,
+      "inputs": [
+        {
+          "type": "string",
+          "name": "_playerName"
+        },
+        {
+          "type": "uint8",
+          "name": "_position"
+        },
+        {
+          "type": "uint8",
+          "name": "_rarity"
+        },
+        {
+          "type": "tuple",
+          "name": "_baseStats",
+          "components": [
+            {
+              "type": "uint16",
+              "name": "pace"
+            },
+            {
+              "type": "uint16",
+              "name": "shooting"
+            },
+            {
+              "type": "uint16",
+              "name": "passing"
+            },
+            {
+              "type": "uint16",
+              "name": "dribbling"
+            },
+            {
+              "type": "uint16",
+              "name": "defense"
+            },
+            {
+              "type": "uint16",
+              "name": "physical"
+            },
+            {
+              "type": "uint16",
+              "name": "overall"
+            },
+            {
+              "type": "uint256",
+              "name": "lastUpdate"
+            }
+          ]
+        },
+        {
+          "type": "string",
+          "name": "_imageURI"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "name",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "owner",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "ownerOf",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "pause",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "paused",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "performSelfCheck",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "rarityPrices",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "recordMatch",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "bool",
+          "name": "_won"
+        },
+        {
+          "type": "uint256",
+          "name": "_goals"
+        },
+        {
+          "type": "uint256",
+          "name": "_assists"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "renounceOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "reportAgentDiagnostics",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "string",
+          "name": "_issue"
+        },
+        {
+          "type": "string",
+          "name": "_resolution"
+        },
+        {
+          "type": "bool",
+          "name": "_autoResolved"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "royaltyInfo",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        },
+        {
+          "type": "uint256",
+          "name": "_salePrice"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "address",
+          "name": "receiver"
+        },
+        {
+          "type": "uint256",
+          "name": "royaltyAmount"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "royaltyRecipient",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "address",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "safeTransferFrom",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "from"
+        },
+        {
+          "type": "address",
+          "name": "to"
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "safeTransferFrom",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "from"
+        },
+        {
+          "type": "address",
+          "name": "to"
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        },
+        {
+          "type": "bytes",
+          "name": "data"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "selfCheckInterval",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "setAgentRegulator",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_regulator"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setApprovalForAll",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "operator"
+        },
+        {
+          "type": "bool",
+          "name": "approved"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setAuthorizedMinter",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_minter"
+        },
+        {
+          "type": "bool",
+          "name": "_authorized"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setAuthorizedUpdater",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "_updater"
+        },
+        {
+          "type": "bool",
+          "name": "_authorized"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setMaxSupply",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "_rarity"
+        },
+        {
+          "type": "uint256",
+          "name": "_supply"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setRarityPrice",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint8",
+          "name": "_rarity"
+        },
+        {
+          "type": "uint256",
+          "name": "_price"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "setSelfCheckInterval",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_interval"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "supportsInterface",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "bytes4",
+          "name": "interfaceId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "bool",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "symbol",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "tokenByIndex",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "index"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "tokenData",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ],
+      "outputs": [
+        {
+          "type": "string",
+          "name": "playerName"
+        },
+        {
+          "type": "uint8",
+          "name": "position"
+        },
+        {
+          "type": "uint8",
+          "name": "rarity"
+        },
+        {
+          "type": "tuple",
+          "name": "baseStats",
+          "components": [
+            {
+              "type": "uint16",
+              "name": "pace"
+            },
+            {
+              "type": "uint16",
+              "name": "shooting"
+            },
+            {
+              "type": "uint16",
+              "name": "passing"
+            },
+            {
+              "type": "uint16",
+              "name": "dribbling"
+            },
+            {
+              "type": "uint16",
+              "name": "defense"
+            },
+            {
+              "type": "uint16",
+              "name": "physical"
+            },
+            {
+              "type": "uint16",
+              "name": "overall"
+            },
+            {
+              "type": "uint256",
+              "name": "lastUpdate"
+            }
+          ]
+        },
+        {
+          "type": "tuple",
+          "name": "liveStats",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "distanceCovered"
+            },
+            {
+              "type": "uint16",
+              "name": "sprints"
+            },
+            {
+              "type": "uint16",
+              "name": "topSpeed"
+            },
+            {
+              "type": "uint8",
+              "name": "fatigueLevel"
+            },
+            {
+              "type": "uint16",
+              "name": "passesCompleted"
+            },
+            {
+              "type": "uint8",
+              "name": "shotsOnTarget"
+            },
+            {
+              "type": "uint8",
+              "name": "goals"
+            },
+            {
+              "type": "uint8",
+              "name": "assists"
+            },
+            {
+              "type": "uint256",
+              "name": "lastUpdate"
+            }
+          ]
+        },
+        {
+          "type": "uint256",
+          "name": "mintTimestamp"
+        },
+        {
+          "type": "uint256",
+          "name": "matchesPlayed"
+        },
+        {
+          "type": "address",
+          "name": "agentWallet"
+        },
+        {
+          "type": "bool",
+          "name": "agentEnabled"
+        },
+        {
+          "type": "string",
+          "name": "dynamicImageURI"
+        },
+        {
+          "type": "uint8",
+          "name": "agentHealth"
+        },
+        {
+          "type": "uint256",
+          "name": "lastSelfCheck"
+        },
+        {
+          "type": "uint256",
+          "name": "consecutiveErrors"
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "tokenOfOwnerByIndex",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "owner"
+        },
+        {
+          "type": "uint256",
+          "name": "index"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "tokenURI",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": [
+        {
+          "type": "string",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "totalSupply",
+      "constant": true,
+      "stateMutability": "view",
+      "payable": false,
+      "inputs": [],
+      "outputs": [
+        {
+          "type": "uint256",
+          "name": ""
+        }
+      ]
+    },
+    {
+      "type": "function",
+      "name": "transferFrom",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "from"
+        },
+        {
+          "type": "address",
+          "name": "to"
+        },
+        {
+          "type": "uint256",
+          "name": "tokenId"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "transferOwnership",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "address",
+          "name": "newOwner"
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "unpause",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "updateLiveStats",
+      "constant": false,
+      "payable": false,
+      "inputs": [
+        {
+          "type": "uint256",
+          "name": "_tokenId"
+        },
+        {
+          "type": "tuple",
+          "name": "_newStats",
+          "components": [
+            {
+              "type": "uint256",
+              "name": "distanceCovered"
+            },
+            {
+              "type": "uint16",
+              "name": "sprints"
+            },
+            {
+              "type": "uint16",
+              "name": "topSpeed"
+            },
+            {
+              "type": "uint8",
+              "name": "fatigueLevel"
+            },
+            {
+              "type": "uint16",
+              "name": "passesCompleted"
+            },
+            {
+              "type": "uint8",
+              "name": "shotsOnTarget"
+            },
+            {
+              "type": "uint8",
+              "name": "goals"
+            },
+            {
+              "type": "uint8",
+              "name": "assists"
+            },
+            {
+              "type": "uint256",
+              "name": "lastUpdate"
+            }
+          ]
+        }
+      ],
+      "outputs": []
+    },
+    {
+      "type": "function",
+      "name": "withdraw",
+      "constant": false,
+      "payable": false,
+      "inputs": [],
+      "outputs": []
+    }
+  ]
+}

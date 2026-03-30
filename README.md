@@ -1,92 +1,127 @@
-# Solomons Chamber
+# Solomon's Chamber
 
-A folder-based note-taking system. Write in Markdown. Organize with files.
+> **The Treasury of Soccer Souls Skills**
 
-## What Actually Works Today
+## What's Inside
 
-**📝 Daily Notes** — `bun scripts/daily-note.ts "title"`  
-Creates a dated Markdown file in `05-Self-Notes/daily/`
+This repository contains all the skills, integrations, and protocols needed to make Soccer Souls a viral, multi-agent, multi-modal platform.
 
-**📊 Status Dashboard** — `bun scripts/status.ts`  
-Shows how many notes you have and quick commands to run
+## Quick Answers
 
-**🔗 Link Capture** — `bun scripts/media-link-capture.ts "URL"`  
-Saves a URL with metadata to `06-Media/Links/`
+### Q: How do Souls battle on Twitch?
+**A:** They DON'T battle live in real-time. Instead:
+1. Battles are simulated and recorded
+2. Edited into cinematic highlight reels
+3. Scheduled as "Twitch Premieres" (looks live, but isn't)
+4. Viewers can chat, predict, vote as if it's live
+5. Benefits: Better quality, no technical failures, can produce drama
 
-**🎙️ Voice Memo Stub** — `bun scripts/voice-capture.ts`  
-Creates a Markdown template in `06-Media/Audio/Voice-Memos/Inbox/`  
-*(Does NOT record audio — you transcribe manually or provide your own Whisper setup)*
+### Q: How do NFTs promote fan parks?
+**A:** 
+1. Soul NFTs discover fan parks via NOMAD integration
+2. They "promote" parks to their followers
+3. Tourists get local guides in their language
+4. Soul earns reputation/commission when tourists visit
+5. 16 World Cup 2026 fan parks loaded with full details
 
-**🚀 One-Command Setup** — `bash ONE-CLICK-SETUP.sh`  
-Clones, installs Bun if needed, creates your first note
+### Q: What is ACP integration?
+**A:** AI Character Protocol - makes Soul NFTs autonomous agents with:
+- Personalities (5 archetypes: Striker, Tactician, Defender, Midfielder, Goalkeeper)
+- Memory of past actions
+- Ability to act independently (promote, predict, challenge)
+- Exportable to Virtual Protocol ecosystem
 
-## Quick Start
+## Skills Inventory
+
+| Skill | Purpose | Status |
+|-------|---------|--------|
+| Fan Park Discovery | Find and promote fan parks worldwide | ✅ Ready |
+| ACP Integration | Autonomous AI agents for NFTs | ✅ Ready |
+| Live Broadcast | Create viral battle replays | ✅ Ready |
+| Tourist Guide | Multi-language tourist assistance | 🚧 Planned |
+
+## Repository Structure
+
+```
+Solomons-Chamber/
+├── skills/                    # All skills
+│   ├── fan-park-discovery/   # NOMAD integration
+│   ├── acp-integration/      # AI Character Protocol
+│   ├── live-broadcast/       # Async battle highlights
+│   └── tourist-guide/        # (planned)
+├── integrations/             # External repos
+│   ├── nomad/               # Clone of NOMAD
+│   └── acp/                 # Clone of openclaw-acp
+└── docs/                    # Documentation
+
+```
+
+## Installation
 
 ```bash
-# One command to get started
-bash ONE-CLICK-SETUP.sh
+# Clone external dependencies
+cd integrations
+git clone https://github.com/mauriceboe/NOMAD.git
+git clone https://github.com/Virtual-Protocol/openclaw-acp.git
 
-# Or manually:
-git clone https://github.com/youngstunners88/Solomons-Chamber.git
-cd Solomons-Chamber
-bun scripts/daily-note.ts
+# Setup ACP
+cd acp && npm install && npm run acp -- setup
 ```
 
-## Directory Structure (What It Is)
+## Usage Examples
 
+```python
+# Fan Park Discovery
+from skills.fan-park-discovery.skill import fan_park_skill
+parks = fan_park_skill.discover(country="Mexico")
+fan_park_skill.promote("fp_mexico", "soul_123")
+
+# ACP Agent
+from skills.acp-integration.skill import acp_skill
+acp_skill.create_soul_agent("soul_123", "legend_striker")
+action = acp_skill.get_agent_action("soul_123", context)
+
+# Live Broadcast
+from skills.live-broadcast.skill import broadcast_skill
+replay = broadcast_skill.create_battle_replay(battle_data)
+tiktok = broadcast_skill.render_for_social("battle_123", "tiktok")
 ```
-00-Inbox/              — Random stuff you haven't organized yet
-01-Projects/active/    — Things you're actively working on
-02-Research/           — Topics you're learning about  
-03-Trading/            — Market notes (if you trade)
-04-Assets/             — Templates and reusable bits
-05-Self-Notes/daily/   — ⭐ Daily notes go here
-06-Media/              — Voice memos (stubs), links, transcripts
-07-Archive/            — Old completed stuff
-08-Docs/               — Documentation
-09-Automation/         — Hooks for scheduling (empty)
-10-Skills/             — Skill library (mostly scaffolding)
-```
 
-## What This Is NOT
+## Key Features
 
-- ❌ **NOT a full "second brain"** — It makes files. You organize them.
-- ❌ **NOT automated** — Scripts create templates; you fill them in
-- ❌ **NOT an Obsidian replacement** — No backlinks, no graph view, no plugins
-- ❌ **NOT production-ready** — Some scripts reference files that don't exist yet
+### 22 Languages Supported
+- European: EN, ES, PT, FR, DE, IT, NL
+- Latin American: ES-MX, ES-AR, PT-BR
+- Asian: JA, KO, ZH, HI, AR, TR
+- African (from SA-voices): ZU, XH, AF, NSO, ST, TN, TS, SS, VE, NR
 
-## What's Actually Implemented vs TODO
+### 16 Fan Parks Loaded
+- USA: NYC, LA, Miami, Dallas, etc.
+- Mexico: Mexico City, Guadalajara
+- Canada: Vancouver, Toronto
 
-| Feature | Status | Reality |
-|---------|--------|---------|
-| Daily notes | ✅ Works | Creates Markdown files |
-| Status dashboard | ✅ Works | Counts files, shows stats |
-| Link capture | ✅ Works | Saves URLs with metadata |
-| Voice memos | ⚠️ Partial | Creates stubs only, no recording |
-| Archive old notes | ❌ Broken | Needs vault.ts library |
-| RSS ingestion | ❌ Broken | Needs vault.ts library |
-| Voice processing | ❌ Stub | Console messages, no real audio |
-| Social sharing | ❌ Stub | README only |
-| Multi-channel bots | ❌ Stub | README only |
+### 5 ACP Character Types
+1. Legendary Striker - Confident showman
+2. Tactical Master - Strategic analyst
+3. Passionate Defender - Fierce warrior
+4. Playful Midfielder - Creative connector
+5. Wise Goalkeeper - Calm mentor
 
-See [ROADMAP.md](ROADMAP.md) for the vision vs reality.
+## Viral Mechanics
 
-## Philosophy
+1. **Fan Park Promotion:** Tourists discover parks through Soul NFTs
+2. **ACP Autonomy:** Souls act independently, creating content
+3. **Async Battles:** High-quality battle highlights for social media
+4. **Multi-language:** Accessible to global World Cup audience
 
-**Human expression first.**  
-This system makes files. You write in them. That's it.
+## Next Steps
 
-**Automation is optional.**  
-The scripts save you 30 seconds of `touch` and `cat`. They're helpers, not magic.
+1. ✅ Skills built and saved in Chamber
+2. 🔄 Integrate NOMAD for real-time park data
+3. 🔄 Deploy ACP agents to production
+4. 🔄 Produce first battle highlight reel
+5. 🔄 Partner with actual fan park venues
 
-**Text files over apps.**  
-Markdown in folders. No lock-in. No cloud. If GitHub dies tomorrow, you still have your notes.
+---
 
-## Requirements
-
-- Git
-- [Bun](https://bun.sh/) (auto-installed by ONE-CLICK-SETUP.sh if missing)
-
-## License
-
-MIT — Do what you want. Keep it honest.
+**The Chamber is stocked. Time to build!** ⚽🏛️

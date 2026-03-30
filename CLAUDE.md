@@ -12,9 +12,9 @@ LOAD: /home/teacherchris37/memory/recent-memory.md
 
 ### Current Session Context
 
-**Active Project**: robeetsday / iHhashi ecosystem
-**Current Task**: Building persistent memory layer and research scout skills
-**Last User Intent**: Create comprehensive memory system with scheduled consolidation
+**Active Project**: Solomon's Chamber / Universal Storage System
+**Current Task**: Automatic session logging - capturing all agent activities
+**Last User Intent**: Automatically store everything we do in Solomon's Chamber
 
 ### Key Facts (Last 48h)
 
@@ -139,4 +139,43 @@ python3 ~/skills/consolidate-memory/scripts/add_fact.py --recent "User prefers X
 
 ---
 
-*This file is loaded at every session start. Last updated: 2026-03-27*
+---
+
+## Solomon's Chamber - Automatic Storage
+
+> **🟢 ACTIVE**: All sessions are automatically logged to Solomon's Chamber
+
+### Storage Locations
+
+| Content Type | Location | Description |
+|--------------|----------|-------------|
+| Session Logs | `09-Agent-Sessions/archive/` | Complete conversation history |
+| Daily Notes | `05-Self-Notes/daily/` | Daily activity summaries |
+| Projects | `01-Projects/` | Active project work |
+| Research | `02-Research/` | Research insights |
+| Trading | `03-Trading/` | Trading analysis |
+| Media | `06-Media/` | Voice memos, links, transcripts |
+
+### Current Session
+
+```
+LOAD: /home/teacherchris37/Solomons-Chamber/09-Agent-Sessions/current/
+```
+
+Active sessions are stored in `current/` and moved to `archive/` when finalized.
+
+### Logging Categories
+
+- 👤 User Requests
+- 🔧 Tool Calls
+- 📊 Tool Results
+- 💬 Agent Responses
+- 📄 Files Created
+- ✏️ Files Modified
+- 🎯 Decisions
+- ❌ Errors
+- 🏆 Milestones
+
+---
+
+*This file is loaded at every session start. Last updated: 2026-03-30*

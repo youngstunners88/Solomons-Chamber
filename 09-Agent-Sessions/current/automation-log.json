@@ -1,0 +1,165 @@
+{
+  "timestamp": "2026-03-30T17:09:54.782Z",
+  "targets": [
+    {
+      "name": "aasj-plumbers",
+      "category": "plumbing",
+      "repo": "https://github.com/youngstunners88/aasj-plumbers.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/aasj-plumbers",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #0E4C92",
+        "Tagline: \"Your Pipes, Our Priority\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "betta-cleaning",
+      "category": "cleaning",
+      "repo": "https://github.com/youngstunners88/betta-cleaning.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/betta-cleaning",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #0984E3",
+        "Tagline: \"Clean Home, Happy Life\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "bluestars-cleaning-service",
+      "category": "cleaning",
+      "repo": "https://github.com/youngstunners88/bluestars-cleaning-service.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/bluestars-cleaning-service",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #0984E3",
+        "Tagline: \"Professional Shine\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "gift-plumbing",
+      "category": "plumbing",
+      "repo": "https://github.com/youngstunners88/gift-plumbing.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/gift-plumbing",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #1E3A5F",
+        "Tagline: \"Flowing Excellence\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "mike-plumbing",
+      "category": "plumbing",
+      "repo": "https://github.com/youngstunners88/mike-plumbing.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/mike-plumbing",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #0066CC",
+        "Tagline: \"Flowing Excellence\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "malachi-cleaning",
+      "category": "cleaning",
+      "repo": "https://github.com/youngstunners88/malachi-cleaning.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/malachi-cleaning",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #6C5CE7",
+        "Tagline: \"Spotless Every Time\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "asap-handyman",
+      "category": "handyman",
+      "repo": "https://github.com/youngstunners88/asap-handyman-maintenance-renovatio.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/asap-handyman",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #E17055",
+        "Tagline: \"Your Home, Our Care\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "dust-out-window",
+      "category": "cleaning",
+      "repo": "https://github.com/youngstunners88/dust-out-window-cleaning-website.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/dust-out-window",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #6C5CE7",
+        "Tagline: \"Spotless Every Time\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "amazing-car-care",
+      "category": "auto",
+      "repo": "https://github.com/youngstunners88/amazing-car-care.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/amazing-car-care",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #D63031",
+        "Tagline: \"Drive Clean\"",
+        "Design system with 5 brand colors"
+      ]
+    },
+    {
+      "name": "spot-on-locksmiths",
+      "category": "locksmith",
+      "repo": "https://github.com/youngstunners88/spot-on-locksmiths.git",
+      "status": "error",
+      "localPath": "/tmp/website-automation/spot-on-locksmiths",
+      "branch": "redesign-2026",
+      "issues": [
+        "Mentions template"
+      ],
+      "improvements": [
+        "Brand identity: #2C3E50",
+        "Tagline: \"Securing What Matters\"",
+        "Design system with 5 brand colors"
+      ]
+    }
+  ]
+}

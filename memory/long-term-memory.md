@@ -89,6 +89,35 @@ Infrastructure: Backend (FastAPI), Frontend (React), Mobile (Capacitor), Blockch
 
 ## Active Projects (Long-Term Context)
 
+### 0. Teacher's Command Center — AI Agents (CURRENT)
+**Status**: Architecture Complete  
+**Started**: 2026-03-31  
+**Context**: Building implementor agents for teachers-command-center platform
+
+**Agent Personas**:
+- **Hermes**: Curriculum & content agent (teacher-facing)
+  - Lesson plan generation
+  - Content curation (Twinkl, Canva, Pinterest)
+  - Assessment creation
+  - Standards alignment
+  
+- **SpaceBot**: Technical implementation agent (dev-facing)
+  - UI component generation
+  - API integrations
+  - Automation workflows
+  - Custom tool development
+
+**Collaboration Model**:
+- Intent classifier routes requests
+- Solo mode for pure curriculum or pure technical
+- Hybrid mode where agents collaborate
+- Shared context and memory
+
+**Files**:
+- `Solomons-Chamber/01-Projects/agent-architecture/`
+
+---
+
 ### 1. RobeetsDay/iHhashi Core (ONGOING)
 Status: Active development  
 Priority: High  

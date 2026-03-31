@@ -90,6 +90,38 @@ None
 - Agent orchestration improvements
 - Memory layer (meta-improvement)
 
+### 🔴 PRIORITY 0: SpaceBot × Hermes Agent Architecture
+**Status**: Architecture Complete (Ready for Implementation)  
+**Started**: 2026-03-31  
+**Priority**: HIGH
+
+#### Overview
+Designing hybrid AI agent architecture combining:
+- **SpaceBot** (Spacedrive): Concurrent process model in Rust
+- **Hermes Agent** (NousResearch): Multi-platform gateway ecosystem
+
+#### Deliverables Created
+- Full architecture comparison document
+- 3 integration strategy options
+- 35-day implementation roadmap
+- Component compatibility matrix
+
+#### Key Decisions
+- **Recommended approach**: SpaceBot core + Hermes gateways via IPC bridge
+- **Transport**: gRPC for flexibility
+- **Memory**: Unified LanceDB + SQLite layer
+- **Deployment**: Docker Compose → Kubernetes
+
+#### Next Steps
+- Phase 1: Build IPC bridge (gRPC protobuf schemas)
+- Phase 2: Integrate Hermes platform adapters
+- MVP target: 14 days
+
+#### Files
+- `Solomons-Chamber/01-Projects/agent-architecture/SPACEBOT_HERMES_ARCHITECTURE.md`
+- `Solomons-Chamber/01-Projects/agent-architecture/IMPLEMENTATION_ROADMAP.md`
+- `Solomons-Chamber/01-Projects/agent-architecture/README.md`
+
 ---
 
 ## Session State

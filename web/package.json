@@ -1,0 +1,13 @@
+{
+  "name": "solomons-chamber-web",
+  "version": "1.0.0",
+  "description": "Web dashboard for Solomon's Chamber vault",
+  "private": true,
+  "scripts": {
+    "dev": "bun --watch server.ts",
+    "start": "bun server.ts"
+  },
+  "dependencies": {
+    "hono": "^4.0.0"
+  }
+}

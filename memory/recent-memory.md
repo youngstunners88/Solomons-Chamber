@@ -4,17 +4,34 @@ Last Updated: 2026-03-27T17:40:00Z
 
 ## Current Session Context
 
-**Active Project**: robeetsday / iHhashi ecosystem
-**Current Task**: Building persistent memory layer and research scout skills
-**Last User Intent**: Create comprehensive memory system with scheduled consolidation
+**Active Project**: Teacher's Command Center — Hermes × SpaceBot integration
+**Current Task**: Integrated 4 autonomous tools + persistent memory + agent UI
+**Last User Intent**: Install open-source tools into agent architecture for seamless autonomous use by non-technical teachers
 
 ## Last 48 Hours - Key Interactions
 
-### 2026-03-27 - Memory System Build
-- **User Request**: Build persistent memory layer with 3 files (recent, long-term, project)
-- **Created**: /memory directory structure
-- **Skills Built**: consolidate-memory, research-scout
-- **Key Decision**: Use ~/.claude logs as source for consolidation
+### 2026-04-02 - Hermes × SpaceBot Tool Integration (Part 1)
+- **User Request**: Install 7 external repos into agent architecture for autonomous use
+- **Decision**: Trimmed to 4 teacher-optimized tools (MarkItDown, PaddleOCR, OpenMontage, Multilingual-TTS)
+- **Removed**: EverClaw, SentrySearch, Hypergraph (unnecessary for non-technical teachers)
+- **Created**:
+  - `@teacher-platform/agent-memory` package (Dexie/IDB + CRDT + sync + recovery)
+  - `@teacher-platform/agent-tools` package (4 tool wrappers with graceful failures)
+  - Agent UI pages: `/dashboard/agents`, `/hermes`, `/spacebot`
+  - Supabase migration `006_agent_memory.sql`
+  - Architecture doc: `INTEGRATED_TOOLS_ARCHITECTURE.md`
+- **Key Principle**: Everything local-first, works through load shedding, no API knowledge required from teachers
+
+### 2026-04-02 - Voice, My Notes & Heartbeat (Part 2)
+- **User Request**: Add Solomon's Chamber (simplified for teachers), instant voice responses, calendar voice commands, optimized heartbeat
+- **Created**:
+  - `@teacher-platform/agent-voice` package — Web Speech API STT + TTS, **zero API keys required**
+  - `My Notes` — simplified Solomon's Chamber at `/dashboard/notes` (4 categories: Daily, Lesson Ideas, Student Notes, Quick Capture)
+  - Voice calendar integration — "What's my lesson on Friday at 1pm?" → instant visual + audio response
+  - Floating voice command button on all dashboard pages
+  - Mic buttons inside HermesChat and SpaceBotBuilder
+  - Agent heartbeat config (`packages/agent-memory/src/config.ts`) with Default / Fast / Conservative presets tuned for SA load shedding
+- **Key Principle**: Voice is free, instant, and works offline. ElevenLabs is explicitly opt-in only.
 
 ### 2026-03-27 - Skills Installation
 - **User Request**: Install browser-use, frontend-design, agent-browser, ai-image-generation skills

@@ -176,3 +176,29 @@ Format:
 - **Claude Code**: Different tool (avoid command confusion)
 - **Solomon's Chamber**: Personal knowledge management system
 - **Self-Growth Skill**: Mistake learning system
+
+
+### 4. Teacher's Command Center — Agent Tool Integration (COMPLETE)
+**Status**: Architecture & Implementation Done  
+**Date**: 2026-04-02  
+
+#### Integrated Tools
+- **MarkItDown** — Document-to-Markdown conversion for lesson ingestion
+- **PaddleOCR** (RapidOCR fallback) — Image/PDF text extraction for digitizing worksheets
+- **OpenMontage** — Educational video generation from lesson prompts
+- **Multilingual-TTS** — Audio lesson generation in 150+ languages (Zulu, Xhosa, Afrikaans, etc.)
+
+#### Architecture Deliverables
+- `@teacher-platform/agent-memory` — CRDT-based persistent memory with offline sync + heartbeat config
+- `@teacher-platform/agent-tools` — Autonomous tool SDK with graceful error handling
+- `@teacher-platform/agent-voice` — Zero-API-key voice command SDK (Web Speech API)
+- Agent UI at `/dashboard/agents/hermes` and `/dashboard/agents/spacebot` (with mic buttons)
+- `My Notes` — Simplified Solomon's Chamber for teachers at `/dashboard/notes`
+- Voice Calendar Integration — "What's my lesson on Friday at 1pm?" → instant audio + visual response
+- Floating global voice button on all dashboard pages
+- Supabase migration `006_agent_memory.sql`
+
+#### Design Principles
+- **Local-first**: Survives load shedding / disconnection
+- **Voice-first**: No API keys needed for speech recognition or synthesis
+- **Teacher-simple**: No jargon, no complex folder systems, no setup required

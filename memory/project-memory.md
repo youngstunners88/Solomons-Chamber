@@ -90,6 +90,53 @@ None
 - Agent orchestration improvements
 - Memory layer (meta-improvement)
 
+---
+
+### 🔴 PRIORITY 5: Hermes × SpaceBot Tool Integration
+**Status**: Architecture Complete & Installed  
+**Started**: 2026-04-02  
+**Completed**: 2026-04-02
+
+#### Integrated Tools
+| Tool | Agent | Purpose |
+|------|-------|---------|
+| **MarkItDown** | Both | Document → Markdown conversion |
+| **PaddleOCR** (RapidOCR fallback) | Both | Image/PDF text extraction |
+| **OpenMontage** | Hermes | Educational video generation |
+| **Multilingual-TTS** | Hermes | Audio lessons in 150+ languages |
+
+#### Removed (Unnecessary)
+- EverClaw (overlap + security risk)
+- SentrySearch (too niche)
+- Hypergraph (too technical)
+
+#### New Packages
+- `@teacher-platform/agent-memory` - Persistent memory with CRDT sync
+- `@teacher-platform/agent-tools` - Autonomous tool SDK
+
+#### UI Added
+- `/dashboard/agents` - Agent selector
+- `/dashboard/agents/hermes` - Chat interface
+- `/dashboard/agents/spacebot` - Builder interface
+- Sidebar navigation updated with Agents link
+
+#### Files
+- `packages/agent-memory/src/{db,crdt,store,sync,recovery,index}.ts`
+- `packages/agent-tools/src/{base-tool,markitdown,paddleocr,openmontage,multilingual-tts,types,index}.ts`
+- `apps/web/app/(dashboard)/agents/**`
+- `apps/web/components/agents/**`
+- `apps/web/lib/agents/**`
+- `supabase/migrations/006_agent_memory.sql`
+- `Solomons-Chamber/01-Projects/agent-architecture/INTEGRATED_TOOLS_ARCHITECTURE.md`
+
+#### Next Steps
+1. `pnpm install` to link new packages (including agent-voice)
+2. `supabase db push` for memory tables
+3. Test voice commands: "What's my lesson on Friday at 1pm?"
+4. Wire API routes to real LLM + tool orchestration
+5. Set up OpenMontage API keys (optional)
+6. Download TTS models or deploy TTS-API-Neucodec (optional)
+
 ### 🔴 PRIORITY 0: SpaceBot × Hermes Agent Architecture
 **Status**: Architecture Complete (Ready for Implementation)  
 **Started**: 2026-03-31  

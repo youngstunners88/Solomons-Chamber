@@ -55,3 +55,31 @@ by default while investigating two GitHub READMEs.
 
 Nothing changes. Hydra's scaffold as pushed already correctly ships `browser-use` behind the
 sidecar boundary described in SPEC.md, and needs no edit either way.
+
+---
+
+## Update, 2026-09-18 — the spike ran, and it answers a different question than expected
+
+The user supplied `TYPESAFE_API_KEY`. The spike ran for real against three allowlisted
+targets (gmgn.ai, dexscreener.com, geckoterminal.com). **All three returned a Cloudflare
+bot-check page, not real content.** GeckoTerminal's was retried across 18 seconds to rule
+out a transient auto-clearing challenge; it did not clear.
+
+This is not a jev-ultrafast-specific result. The block happens at the network/fingerprint
+layer, before either library's action-selection logic runs — base `browser-use` would face
+the identical challenge from the identical headless-browser fingerprint and network position.
+
+**The engine-swap question this proposal originally asked is no longer the live one.** Before
+"jev-ultrafast vs. browser-use" can be decided, a prior question needs an answer: **can
+headless automated browsing reach these specific sites at all from wherever Hydra will
+actually run** — not this evaluation sandbox, whose proxy egress may or may not resemble a
+real deployment's network position.
+
+Full result, including exactly what had to be built to get a real answer (a headless Chrome
+launch, CDP wiring, and proxy routing that jev-ultrafast's own README doesn't document) is in
+`services/browser-hunter/spikes/RESULTS-2026-09-18.md` in the hydra repo.
+
+**Not recommended as a next step:** engineering around the Cloudflare block (fingerprint
+spoofing, residential proxy rotation, CAPTCHA solving). That's a materially more adversarial
+posture than "read-only hunting via allowlisted public pages" and wasn't asked for — it's
+flagged here as the tempting-but-wrong next move, not taken.

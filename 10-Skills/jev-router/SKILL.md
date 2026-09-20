@@ -46,25 +46,37 @@ usage: |
 
 # Jev router
 
-## The one-line answer to "use it in OpenRouter"
+## Jev on OpenRouter — and a correction
 
-**You can't — Jev is not an OpenRouter model.** Checked live on 2026-09-20:
-446 models on OpenRouter, zero matching `jev`, `typesafe` or `systemone`. It
-is TypeSafe's own endpoint (`api.typesafe.ai/v1/systemone`) with its own key.
+**Jev is on OpenRouter.** The model id is `jev-latest`; both
+`openrouter.ai/api/v1/systemone` and `/api/alpha/decisions` serve it, and
+`DEFAULT_ROUTE` in the client now points at the first of those.
 
-What *is* real, and is what this skill builds, is the pairing. `jev-ultrafast`
-already ships it: Jev makes the structured decision, then a second
-OpenAI-compatible endpoint writes any free text. That second endpoint is set
-by `TEXT_MODEL_BASE_URL`, a plain environment variable defaulting to DeepSeek's
-own API — so pointing it at OpenRouter is configuration, not a patch:
+An earlier version of this skill said the opposite, loudly. That was wrong.
+The check behind it searched OpenRouter's `/v1/models` catalogue for "jev",
+found nothing among 446 entries, and stopped — but **decisions models are not
+in that catalogue**. A single POST to chat/completions returns the answer
+directly: *"jev-latest is a decisions model... Use the /api/alpha/decisions
+endpoint instead."* A catalogue is not a probe.
 
-```bash
-export TEXT_MODEL_BASE_URL=https://openrouter.ai/api/v1
-export TEXT_MODEL_API_KEY="$OPENROUTER_API_KEY"
-export TEXT_MODEL=deepseek/deepseek-v4-pro
+Measured over five calls each, OpenRouter is **not** the slower path here
+(347 ms median against 396 ms direct), it reports **cost**, and it returns a
+**fully pinned version** string where direct returns a looser one. Details and
+the full table: `references/measured-behaviour.md`.
+
+```python
+ask(state, questions)                      # OpenRouter, the default
+ask(state, questions, route="direct")      # api.typesafe.ai
 ```
 
-Two lanes of one pipeline. Not one model calling another.
+Keys are per route and never shared: `OPENROUTER_API_KEY` for the gateway,
+`TYPESAFE` / `TYPESAFE_API_KEY` for direct. A test asserts the OpenRouter key
+is never used to authenticate against TypeSafe.
+
+**Pin the model in anything whose thresholds matter.** `jev-latest` floats;
+`JevResult.version_floated` is True whenever a floating alias resolved to
+something else, because a silent upgrade moves every cut-off in the policy
+layer without changing a line of code.
 
 ## Why bother
 

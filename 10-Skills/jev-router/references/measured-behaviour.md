@@ -140,13 +140,58 @@ diff came back in **717 ms** for 553 input / 75 output tokens, with the boolean
 at 0.07 (NO), the score at 3.5 of 4 (confidence 0.58) and the choice
 `RISK_CONTROL` at 0.56.
 
-## Jev is not on OpenRouter
+## Jev IS on OpenRouter — an earlier claim here was wrong
 
-Checked against OpenRouter's live `/api/v1/models` on 2026-09-20: **446 models,
-zero** matching `jev`, `typesafe`, or `systemone`. It is a separate vendor with
-a separate endpoint and a separate key.
+**Corrected 2026-09-21.** This file previously stated, under a heading reading
+"Jev is not on OpenRouter", that a check of OpenRouter's `/api/v1/models`
+returned 446 models and zero matches for `jev`, `typesafe` or `systemone`.
 
-The real connection is at the other end of the pipeline. `jev-ultrafast`'s own
+The search result was real. **The conclusion drawn from it was wrong**, because
+decisions models are not listed in that catalogue at all. One POST to
+chat/completions says so in as many words:
+
+```
+"jev-latest is a decisions model and cannot be used with the
+ chat/completions endpoint. Use the /api/alpha/decisions endpoint instead."
+```
+
+A catalogue is not a probe. The cheap test — try it and read the error — was
+available the whole time and was not run.
+
+Both OpenRouter paths work:
+
+| Route | Result |
+|---|---|
+| `openrouter.ai/api/v1/systemone` | 200, same request/response shape as direct |
+| `openrouter.ai/api/alpha/decisions` | 200, identical answers |
+
+### Measured, five calls each
+
+| Route | median | min | served model | cost reported |
+|---|---|---|---|---|
+| direct `api.typesafe.ai/v1/systemone` | **396 ms** | 369 | `jev-1.13.0` | no |
+| OpenRouter `/api/v1/systemone` | **347 ms** | 336 | `typesafe/jev-1.13-20260917` | **yes** |
+| OpenRouter `/api/alpha/decisions` | **367 ms** | 338 | `typesafe/jev-1.13-20260917` | **yes** |
+
+The widely-repeated advice that gateways "add a round trip you cannot recover"
+**did not reproduce here** — OpenRouter was the faster of the two. That claim
+is plausible in principle and may hold from a colocated box; it is not what
+this environment measures, and it is quoted often enough to be worth saying so.
+
+Two things the gateway does strictly better:
+
+- **It reports cost** (`1.4868e-05` for a 354-token call). The direct route
+  does not, so cost has to be inferred from a price list.
+- **It returns a fully pinned version**, `typesafe/jev-1.13-20260917`, where
+  direct returns `jev-1.13.0`. That matters because thresholds are calibrated
+  against one model, and a floating alias that silently upgrades moves every
+  cut-off in the policy layer without changing a line of code. The client now
+  surfaces this as `JevResult.version_floated`.
+
+`DEFAULT_ROUTE` is therefore OpenRouter. One key (`OPENROUTER_API_KEY`) now
+serves both lanes.
+
+The prose lane is unaffected and still belongs to a text model. `jev-ultrafast`'s own
 `model.py` calls Jev for the structured decision and then a second,
 OpenAI-compatible endpoint for the one thing Jev cannot do — write text:
 

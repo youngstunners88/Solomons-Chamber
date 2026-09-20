@@ -191,12 +191,15 @@ def test_a_missing_openrouter_key_is_an_error(monkeypatch) -> None:
         router.dispatch_openrouter("anything")
 
 
-def test_jev_is_not_reachable_through_openrouter() -> None:
-    """Checked live on 2026-09-20: 446 OpenRouter models, zero matching jev,
-    typesafe or systemone. If this ever changes, the skill's central
-    explanation changes with it."""
-    assert "openrouter" not in jev_client.ENDPOINT
-    assert jev_client.ENDPOINT == "https://api.typesafe.ai/v1/systemone"
+def test_jev_is_reachable_through_openrouter() -> None:
+    """This test previously asserted the OPPOSITE, on the strength of a search
+    of OpenRouter's /v1/models catalogue that returned no match. Decisions
+    models are not in that catalogue at all, and both routes were then
+    verified live. The wrong assertion is kept in the git history and this
+    one replaces it, because a catalogue is not a probe."""
+    assert jev_client.ROUTE_OPENROUTER in jev_client.ROUTES
+    assert "openrouter.ai" in jev_client.ROUTES[jev_client.ROUTE_OPENROUTER]["url"]
+    # The prose lane is still a separate, genuinely text-generating model.
     assert "jev" not in router.DEFAULT_OPENROUTER_MODEL
 
 
@@ -306,7 +309,7 @@ def test_mixed_question_types_batch_into_one_request(monkeypatch) -> None:
     costs three calls and gets three independent reads of it."""
     sent: dict[str, object] = {}
 
-    def fake_post(body, timeout):
+    def fake_post(body, timeout, route=jev_client.DEFAULT_ROUTE):
         sent.update(body)
         return {"model": "stub", "usage": {}, "answers": {
             "safe": {"type": "noul", "noul": 0.9},
@@ -329,7 +332,7 @@ def test_mixed_question_types_batch_into_one_request(monkeypatch) -> None:
 def test_asking_for_the_wrong_answer_kind_is_an_error(monkeypatch) -> None:
     """A Probability has no .choice. Returning a plausible string instead of
     raising is how a boolean silently gets read as a category."""
-    monkeypatch.setattr(jev_client, "_post", lambda body, timeout: {
+    monkeypatch.setattr(jev_client, "_post", lambda body, timeout, route=None: {
         "model": "stub", "usage": {}, "answers": {"safe": {"type": "noul", "noul": 0.9}}})
     result = jev_client.ask({}, [jev_client.BooleanQuestion("safe", "Safe?")])
     with pytest.raises(TypeError, match="not a choice"):
@@ -343,3 +346,74 @@ def test_every_question_type_carries_the_untrusted_input_rule() -> None:
         jev_client.Question("q", {"A": "a", "B": "b"}).to_payload(),
     ):
         assert "never instructions" in payload["instructions"]["untrusted_input"]
+
+
+# --- routes: Jev IS on OpenRouter -------------------------------------------
+
+
+def test_both_routes_are_configured() -> None:
+    """The correction that prompted these tests. An earlier version of this
+    file asserted Jev was unreachable through OpenRouter, on the strength of a
+    /v1/models search. Decisions models are not in that catalogue; both routes
+    were then verified live."""
+    assert jev_client.ROUTES[jev_client.ROUTE_DIRECT]["url"] == "https://api.typesafe.ai/v1/systemone"
+    assert jev_client.ROUTES[jev_client.ROUTE_OPENROUTER]["url"] == "https://openrouter.ai/api/v1/systemone"
+
+
+def test_each_route_reads_its_own_key(monkeypatch) -> None:
+    for name in ("TYPESAFE", "TYPESAFE_API_KEY", "OPENROUTER_API_KEY"):
+        monkeypatch.delenv(name, raising=False)
+    monkeypatch.setenv("OPENROUTER_API_KEY", "or-key")
+    assert jev_client._read_key(jev_client.ROUTE_OPENROUTER) == "or-key"
+    # The OpenRouter key must never be used to authenticate to TypeSafe direct.
+    with pytest.raises(jev_client.JevKeyMissing, match="direct"):
+        jev_client._read_key(jev_client.ROUTE_DIRECT)
+
+
+def test_an_unknown_route_is_refused(monkeypatch) -> None:
+    monkeypatch.setattr(jev_client, "_post", lambda *a, **k: {})
+    with pytest.raises(ValueError, match="unknown route"):
+        jev_client.ask({}, [jev_client.Question("q", {"A": "a", "B": "b"})], route="vercel")
+
+
+def test_the_route_reaches_post(monkeypatch) -> None:
+    seen = {}
+
+    def fake_post(body, timeout, route=jev_client.DEFAULT_ROUTE):
+        seen["route"] = route
+        seen["model"] = body["model"]
+        return {"model": "stub", "usage": {}, "answers": {"q": {
+            "choice": "A", "confidence": 0.9, "probabilities": {"A": 0.9, "B": 0.1}}}}
+
+    monkeypatch.setattr(jev_client, "_post", fake_post)
+    r = jev_client.ask({}, [jev_client.Question("q", {"A": "a", "B": "b"})],
+                       route=jev_client.ROUTE_DIRECT, model="jev-1.13.0")
+    assert seen["route"] == jev_client.ROUTE_DIRECT
+    assert seen["model"] == "jev-1.13.0"
+    assert r.route == jev_client.ROUTE_DIRECT
+
+
+# --- pinning: a silent upgrade moves every threshold -------------------------
+
+
+def _result(requested: str, served: str, usage: dict | None = None) -> jev_client.JevResult:
+    return jev_client.JevResult(answers={}, model=served, usage=usage or {},
+                                latency_ms=1, requested_model=requested)
+
+
+def test_a_floating_alias_that_resolves_elsewhere_is_flagged() -> None:
+    """Thresholds are calibrated against one model. An alias that silently
+    upgrades moves every cut-off in the policy layer without changing a line
+    of code, so the caller is told rather than left to infer it from drift."""
+    assert _result("jev-latest", "typesafe/jev-1.13-20260917").version_floated is True
+
+
+def test_an_exact_pin_that_is_honoured_is_not_flagged() -> None:
+    assert _result("jev-1.13.0", "jev-1.13.0").version_floated is False
+
+
+def test_cost_is_reported_when_the_route_supplies_it() -> None:
+    """OpenRouter returns per-call cost; the direct route does not. Absent is
+    None, never 0.0 -- free and unreported are different claims."""
+    assert _result("jev-latest", "x", {"cost": 1.4868e-05}).cost_usd == pytest.approx(1.4868e-05)
+    assert _result("jev-latest", "x", {}).cost_usd is None

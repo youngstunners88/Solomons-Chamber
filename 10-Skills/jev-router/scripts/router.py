@@ -8,10 +8,15 @@ is a plain env var, so pointing it at OpenRouter is a configuration change, not
 a patch. That is the honest sense in which Jev is "used in OpenRouter": they
 are two lanes of one pipeline, not one model calling another.
 
-Jev itself is NOT available through OpenRouter. Checked against OpenRouter's
-live model list on 2026-09-20: 446 models, zero matching jev / typesafe /
-systemone. It is its own vendor endpoint with its own key, and a skill that
-implied otherwise would send people hunting for a model id that does not exist.
+Jev IS available through OpenRouter, as the model id `jev-latest`, on both
+`/api/v1/systemone` and `/api/alpha/decisions`. An earlier version of this
+docstring said the opposite on the strength of a `/v1/models` search that
+returned no match -- decisions models are not in that catalogue. Corrected
+2026-09-21; see `references/measured-behaviour.md`.
+
+So one key can now serve both lanes: OPENROUTER_API_KEY reaches Jev for the
+decision and a text model for the prose. The lanes stay separate because they
+are different KINDS of work, not because they were different vendors.
 
 Lanes:
 

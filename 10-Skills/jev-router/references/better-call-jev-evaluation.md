@@ -72,9 +72,15 @@ endpoint: () => 'https://ai-gateway.vercel.sh/v1/evaluate',
 buildRequest: ... { model: 'typesafe-ai/jev', state, questions }
 ```
 
-So its `JEV_API_KEY` is a **Vercel AI Gateway key**, not a TypeSafe key. We hold
-a TypeSafe key (`TYPESAFE`). **The repo as shipped will not run for us** without
-signing up for a second vendor.
+So its `JEV_API_KEY` is a **Vercel AI Gateway key**, not a TypeSafe key, and
+the repo as shipped needs a Vercel account we do not have.
+
+**But the wider conclusion drawn from this at the time was wrong.** This
+evaluation was written alongside a claim that Jev was reachable only through
+TypeSafe direct or Vercel. It is also on **OpenRouter** (`jev-latest`), which
+we already hold a key for -- so there are three routes, not two, and the one
+we can use costs nothing extra. Corrected 2026-09-21; the gateway comparison
+below still stands on its own terms.
 
 That is not fatal, because the two routes reach the same model — but they are
 not interchangeable, and the difference is observable:

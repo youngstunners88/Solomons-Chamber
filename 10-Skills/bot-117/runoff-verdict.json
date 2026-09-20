@@ -1,0 +1,63 @@
+{
+ "primary": "WORK_FUNDS_BUILDING",
+ "margin": 0.45,
+ "work_alone_explains_the_top": "NO",
+ "ceiling_is_binding": "UNDECIDED",
+ "decomposition": [
+  {
+   "name": "no-town node",
+   "bits_a_day": 18725,
+   "worked_bits_per_day": 1617,
+   "unexplained_by_work_per_day": 17108,
+   "share_from_work": "9%",
+   "objects_built": 192,
+   "items_sold": 0,
+   "parcels": 8,
+   "self_described_as": "building"
+  },
+  {
+   "name": "HERO Metaverse",
+   "bits_a_day": 16006,
+   "worked_bits_per_day": 3092,
+   "unexplained_by_work_per_day": 12914,
+   "share_from_work": "19%",
+   "objects_built": 19,
+   "items_sold": 502,
+   "parcels": 3,
+   "self_described_as": "selling"
+  },
+  {
+   "name": "Dealmint",
+   "bits_a_day": 11941,
+   "worked_bits_per_day": 4027,
+   "unexplained_by_work_per_day": 7914,
+   "share_from_work": "34%",
+   "objects_built": 18,
+   "items_sold": 2,
+   "parcels": 7,
+   "self_described_as": "building"
+  },
+  {
+   "name": "Firework",
+   "bits_a_day": 10991,
+   "worked_bits_per_day": 3830,
+   "unexplained_by_work_per_day": 7161,
+   "share_from_work": "35%",
+   "objects_built": 3,
+   "items_sold": 0,
+   "parcels": 5,
+   "self_described_as": "a bit of everything"
+  },
+  {
+   "name": "KCourier",
+   "bits_a_day": 10535,
+   "worked_bits_per_day": 5289,
+   "unexplained_by_work_per_day": 5246,
+   "share_from_work": "50%",
+   "objects_built": 34,
+   "items_sold": 0,
+   "parcels": 3,
+   "self_described_as": "a bit of everything"
+  }
+ ]
+}

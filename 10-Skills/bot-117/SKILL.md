@@ -82,7 +82,8 @@ noise.
   assuming the former cost 52 bits.
 - **A build ≥12 units high is priced as a tower at 20×** — 1,040 bits for 26
   parts against 52. Undocumented in the contract. The lighthouse stands at 11.0
-  for exactly this reason.
+  for exactly this reason, and `lighthouse.py` defaults to 11.0 so the script
+  reproduces what is standing rather than a build the server will refuse.
 - **`rebuild` with the same part count is free**, which is how the probe became
   the lighthouse at zero cost, and how any shape change should be tested.
 

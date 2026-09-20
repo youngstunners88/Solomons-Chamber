@@ -6,8 +6,10 @@ Parcel rules being built against (from the contract, §6):
   - <= 150 parts, 2 bits per part
 
 So the tower is stacked rather than extruded, and every radius stays <= 3.25.
-Heights below are written as explicit bottom/top so the 16-unit ceiling can be
-checked by reading, not by trusting arithmetic done once.
+Heights below are written as explicit bottom/top so the ceiling can be checked
+by reading, not by trusting arithmetic done once. They are authored against the
+16-unit structural limit and then scaled to BUILD_HEIGHT, which is lower for a
+pricing reason explained at that constant.
 """
 
 STONE = "#e6e2d6"
@@ -31,13 +33,20 @@ def window(y: float, radius: float) -> dict:
             "color": LAMP, "emissive": True}
 
 
-# 16.0 high is priced as a tower at 20x (40 bits a part, 1040 for this build).
-# 12.0 is not. Measured against the live server on 2026-09-20 -- the threshold
-# is somewhere in (12, 16] and the contract does not mention the multiplier at
-# all. Everything below is authored at full height and scaled once, so the
+# A build 12.0 units or taller is priced as a TOWER at 20x -- 40 bits a part,
+# 1,040 for these 26 against 52. The contract does not mention the multiplier
+# at all; it was found by running into it. 11.0 is the tallest that prices
+# normally, and 11.0 is what actually stands on 10,-10.
+#
+# Do not "fix" BUILD_HEIGHT back up to 12: the server refuses it unless you are
+# holding 1,040 bits, and the refusal costs a round trip to discover. The
+# threshold was located for free, by rebuilding with an unchanged part count --
+# `rebuild` only bills for ADDED parts, so shape changes are free to test.
+#
+# Everything below is authored at full height and scaled once, so the
 # proportions stay right and only the ceiling moves.
 DESIGN_HEIGHT = 16.0
-BUILD_HEIGHT = 12.0
+BUILD_HEIGHT = 11.0
 SCALE = BUILD_HEIGHT / DESIGN_HEIGHT
 
 

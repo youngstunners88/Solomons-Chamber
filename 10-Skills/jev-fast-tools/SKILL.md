@@ -77,3 +77,11 @@ narrow question to answer *before* enabling either one in a project where the
 answer matters. In this vault, with no money or keys, that question doesn't
 bind — go ahead. In tradecc or hydra, it does, and it hasn't been answered
 yet, so neither tool is enabled there.
+
+## See also
+
+- `10-Skills/jev-router/` — Jev used directly as a decision lane in the build
+  process, paired with OpenRouter for prose. Includes the wire contract
+  recovered by probing the live API, and the measured record of a case where
+  Jev was stably wrong at 0.84 confidence. Read that before trusting a
+  Jev answer anywhere it matters.

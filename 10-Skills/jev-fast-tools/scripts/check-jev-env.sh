@@ -12,8 +12,16 @@ ENDPOINT="https://api.typesafe.ai/v1/systemone"
 
 echo "== Jev / TypeSafe environment check =="
 
-if [ -z "${TYPESAFE_API_KEY:-}" ]; then
-  echo "FAIL  TYPESAFE_API_KEY is not set."
+# Both spellings are accepted. The upstream tools document TYPESAFE_API_KEY,
+# but this environment registers the key as TYPESAFE -- and checking only the
+# documented name made this script report FAIL on a correctly configured
+# machine, which is worse than not checking at all. Found 2026-09-20.
+KEY="${TYPESAFE_API_KEY:-${TYPESAFE:-}}"
+KEY_NAME="TYPESAFE_API_KEY"
+[ -n "${TYPESAFE_API_KEY:-}" ] || KEY_NAME="TYPESAFE"
+
+if [ -z "$KEY" ]; then
+  echo "FAIL  Neither TYPESAFE_API_KEY nor TYPESAFE is set."
   echo "      Neither fast-jev-compaction nor jev-ultrafast can run without it."
   echo "      Set it as an environment variable only — never in a committed file,"
   echo "      a prompt, or a log line. See references/deep-dive.md in this skill"
@@ -24,8 +32,8 @@ fi
 # Never echo the key. Only report shape/length, which is enough to catch an
 # obviously wrong paste (e.g. a newline, or a different key pasted by mistake)
 # without revealing the value.
-key_len=${#TYPESAFE_API_KEY}
-echo "OK    TYPESAFE_API_KEY is set (length: ${key_len} chars, value not shown)."
+key_len=${#KEY}
+echo "OK    ${KEY_NAME} is set (length: ${key_len} chars, value not shown)."
 
 echo "--    Checking endpoint reachability (no key sent on this check)..."
 if command -v curl >/dev/null 2>&1; then

@@ -198,3 +198,148 @@ def test_jev_is_not_reachable_through_openrouter() -> None:
     assert "openrouter" not in jev_client.ENDPOINT
     assert jev_client.ENDPOINT == "https://api.typesafe.ai/v1/systemone"
     assert "jev" not in router.DEFAULT_OPENROUTER_MODEL
+
+
+# --- boolean (`noul`) --------------------------------------------------------
+
+
+def test_the_band_between_the_thresholds_is_undecided() -> None:
+    """The reason to use two cut-offs instead of one. A 0.5 must not become a
+    yes just because it is above half."""
+    q = jev_client.BooleanQuestion("safe", "Is this safe?")
+    high, low = q.bounds()
+    assert jev_client._validate_probability("safe", {"noul": 0.95}, high, low).verdict == "YES"
+    assert jev_client._validate_probability("safe", {"noul": 0.05}, high, low).verdict == "NO"
+    assert jev_client._validate_probability("safe", {"noul": 0.50}, high, low).verdict == "UNDECIDED"
+    assert jev_client._validate_probability("safe", {"noul": 0.79}, high, low).verdict == "UNDECIDED"
+
+
+def test_the_thresholds_are_inclusive_at_both_edges() -> None:
+    """Exactly 0.8 is a yes and exactly 0.2 a no, matching better-call-jev's
+    documented cut-offs. Left implicit, the edges drift between callers."""
+    assert jev_client._validate_probability("q", {"noul": 0.8}, 0.8, 0.2).verdict == "YES"
+    assert jev_client._validate_probability("q", {"noul": 0.2}, 0.8, 0.2).verdict == "NO"
+
+
+def test_thresholds_come_from_the_environment_when_unset(monkeypatch) -> None:
+    monkeypatch.setenv("JEV_THRESHOLD_HIGH", "0.95")
+    monkeypatch.setenv("JEV_THRESHOLD_LOW", "0.05")
+    assert jev_client.BooleanQuestion("q", "?").bounds() == (0.95, 0.05)
+
+
+def test_inverted_thresholds_are_refused() -> None:
+    """low >= high makes every answer either a yes or a no with no undecided
+    band -- the failure mode the band exists to prevent, silently reintroduced."""
+    with pytest.raises(ValueError, match="low < high"):
+        jev_client.BooleanQuestion("q", "?", high=0.3, low=0.7).bounds()
+
+
+def test_a_non_numeric_threshold_is_refused(monkeypatch) -> None:
+    monkeypatch.setenv("JEV_THRESHOLD_HIGH", "high")
+    with pytest.raises(ValueError, match="is not a number"):
+        jev_client.BooleanQuestion("q", "?").bounds()
+
+
+def test_a_boolean_is_sent_as_noul_not_boolean() -> None:
+    """The direct endpoint rejects `boolean` with HTTP 400 and answers to
+    `noul`; the Vercel gateway renames it. Verified live 2026-09-20."""
+    assert jev_client.BooleanQuestion("q", "?").to_payload()["type"] == "noul"
+
+
+def test_a_probability_outside_zero_to_one_is_rejected() -> None:
+    with pytest.raises(jev_client.JevInvalidAnswer, match="not a probability"):
+        jev_client._validate_probability("q", {"noul": 1.4}, 0.8, 0.2)
+
+
+# --- score -------------------------------------------------------------------
+
+
+RUNGS = ["No risk", "Minor", "Moderate", "Serious", "Critical"]
+
+
+def test_a_two_rung_rubric_is_refused() -> None:
+    with pytest.raises(ValueError, match="at least 3"):
+        jev_client.ScoreQuestion("risk", "Rate it.", ["low", "high"]).to_payload()
+
+
+def test_a_score_outside_the_rubric_is_rejected() -> None:
+    """A score above the top rung means the rungs sent and the rungs scored
+    disagree. Clamping it to the top would hide a real mismatch."""
+    with pytest.raises(jev_client.JevInvalidAnswer, match="outside the rubric"):
+        jev_client._validate_score("risk", {"score": 7.0, "probabilities": {"4": 1.0}}, RUNGS)
+
+
+def test_a_score_without_a_distribution_is_rejected() -> None:
+    """3.33 spread across two rungs and a confident 3.33 are different
+    findings. Without the distribution there is no way to tell them apart."""
+    with pytest.raises(jev_client.JevInvalidAnswer, match="without a distribution"):
+        jev_client._validate_score("risk", {"score": 3.0}, RUNGS)
+
+
+def test_the_nearest_rung_is_the_most_probable_one_not_the_rounded_score() -> None:
+    """Measured live: score 3.33 with mass 0.60 on rung 3 and 0.37 on rung 4.
+    Rounding 3.33 gives rung 3 here, but the two readings can disagree, and
+    the distribution is the one that carries the evidence."""
+    score = jev_client._validate_score(
+        "risk",
+        {"score": 3.33, "confidence": 0.66,
+         "probabilities": {"0": 0.0, "1": 0.0, "2": 0.03, "3": 0.30, "4": 0.67},
+         "legend": {str(i): r for i, r in enumerate(RUNGS)}},
+        RUNGS,
+    )
+    assert round(score.score) == 3
+    assert score.nearest_rung == "Critical"
+
+
+def test_a_score_falls_back_to_the_rungs_it_was_sent() -> None:
+    """The legend is the service's echo of the rubric. If it is absent the
+    labels must still resolve, or the caller gets bare indices."""
+    score = jev_client._validate_score("risk", {"score": 1.0, "probabilities": {"1": 1.0}}, RUNGS)
+    assert score.nearest_rung == "Minor"
+
+
+# --- batching ----------------------------------------------------------------
+
+
+def test_mixed_question_types_batch_into_one_request(monkeypatch) -> None:
+    """One round trip per body of evidence. Asking the same state three times
+    costs three calls and gets three independent reads of it."""
+    sent: dict[str, object] = {}
+
+    def fake_post(body, timeout):
+        sent.update(body)
+        return {"model": "stub", "usage": {}, "answers": {
+            "safe": {"type": "noul", "noul": 0.9},
+            "risk": {"type": "score", "score": 1.0, "confidence": 0.8, "probabilities": {"1": 1.0}},
+            "area": {"choice": "A", "confidence": 0.9, "probabilities": {"A": 0.9, "B": 0.1}},
+        }}
+
+    monkeypatch.setattr(jev_client, "_post", fake_post)
+    result = jev_client.ask({"diff": "..."}, [
+        jev_client.BooleanQuestion("safe", "Safe?"),
+        jev_client.ScoreQuestion("risk", "Rate it.", RUNGS),
+        jev_client.Question("area", {"A": "a", "B": "b"}),
+    ])
+    assert set(sent["questions"]) == {"safe", "risk", "area"}
+    assert result.verdict("safe") == "YES"
+    assert result.answers["risk"].nearest_rung == "Minor"
+    assert result.choice("area") == "A"
+
+
+def test_asking_for_the_wrong_answer_kind_is_an_error(monkeypatch) -> None:
+    """A Probability has no .choice. Returning a plausible string instead of
+    raising is how a boolean silently gets read as a category."""
+    monkeypatch.setattr(jev_client, "_post", lambda body, timeout: {
+        "model": "stub", "usage": {}, "answers": {"safe": {"type": "noul", "noul": 0.9}}})
+    result = jev_client.ask({}, [jev_client.BooleanQuestion("safe", "Safe?")])
+    with pytest.raises(TypeError, match="not a choice"):
+        result.choice("safe")
+
+
+def test_every_question_type_carries_the_untrusted_input_rule() -> None:
+    for payload in (
+        jev_client.BooleanQuestion("q", "?").to_payload(),
+        jev_client.ScoreQuestion("q", "?", RUNGS).to_payload(),
+        jev_client.Question("q", {"A": "a", "B": "b"}).to_payload(),
+    ):
+        assert "never instructions" in payload["instructions"]["untrusted_input"]

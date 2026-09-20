@@ -8,9 +8,15 @@ description: |
   skill is the client, the three-lane router, and the measured record of where
   Jev is reliable and where it is confidently wrong.
 
+  Three question types: choice (one of N), score (a rubric, rung by rung) and
+  boolean (sent as `noul`, resolved to yes/no/undecided by thresholds). They
+  batch into one call.
+
   Load this before routing work to Jev anywhere, and BEFORE proposing it for
   tradecc or hydra -- the state you send leaves the machine, which is a
-  data-egress decision there, not a defaults choice.
+  data-egress decision there, not a defaults choice. Also read it before
+  installing the `better-call-jev` plugin, whose always-on hook is evaluated
+  in references/better-call-jev-evaluation.md and is NOT safe here.
 
 allowed-tools: Bash Read
 
@@ -30,6 +36,9 @@ usage: |
 
   # Read what Jev measurably does and does not do well, before trusting it
   cat 10-Skills/jev-router/references/measured-behaviour.md
+
+  # Why we ported better-call-jev's mechanics but not its plugin
+  cat 10-Skills/jev-router/references/better-call-jev-evaluation.md
 
   # Tests (no network)
   pytest 10-Skills/jev-router/tests/
@@ -110,6 +119,43 @@ So:
 Full transcript, timings and the routing accuracy table:
 `references/measured-behaviour.md`.
 
+## Three question types, one call
+
+| Type | Ask it when | You get |
+|---|---|---|
+| `Question` (choice) | one of N named options | `.choice`, `.margin`, distribution |
+| `ScoreQuestion` | a position on a rubric; the middle is meaningful | `.score` (continuous), `.nearest_rung`, distribution |
+| `BooleanQuestion` | yes/no | `.probability`, `.verdict` (`YES`/`NO`/`UNDECIDED`) |
+
+**Batch every question about the same evidence into one call.** One round trip
+is cheaper and more consistent than asking the same state three times and
+getting three independent reads of it. Measured: all three types about one
+diff, 717 ms, 553 input tokens.
+
+```python
+from jev_client import BooleanQuestion, Question, ScoreQuestion, ask
+
+result = ask({"diff": "removed the slippage cap check from execute_swap()"}, [
+    BooleanQuestion("safe", "Is this safe to merge without human review?"),
+    ScoreQuestion("risk", "Rate the risk.",
+                  ["No risk", "Minor", "Moderate", "Serious", "Critical"]),
+    Question("area", {"EXECUTION": "...", "RISK_CONTROL": "...", "DOCS": "..."}),
+])
+result.verdict("safe")                 # 'NO'  (probability 0.07)
+result.answers["risk"].nearest_rung    # 'Critical'  (score 3.5, conf 0.58)
+result.choice("area")                  # 'RISK_CONTROL'
+```
+
+**Booleans resolve through two thresholds, not one.** At or above `high` (0.8)
+it is a YES, at or below `low` (0.2) a NO, and **anything between is
+UNDECIDED** — the band is the point, so a 0.5 never quietly becomes a yes.
+Defaults adopted from `better-call-jev`; override with `JEV_THRESHOLD_HIGH` /
+`JEV_THRESHOLD_LOW`.
+
+Note the wire name: a boolean is sent as **`noul`**. The direct endpoint
+rejects the name `boolean` with HTTP 400 — only the Vercel gateway route
+renames it. A test pins this so the 400 cannot come back silently.
+
 ## Writing a good question
 
 ```python
@@ -128,8 +174,11 @@ result.answers["path"].margin     # lead over the runner-up; key off this
 
 Rules the client enforces so you cannot forget them:
 
-- **At least two options.** A one-option "choice" returns 1.0 every time and
-  reads like agreement.
+- **At least two options** on a choice, **at least three rungs** on a score.
+  A one-option "choice" returns 1.0 every time and reads like agreement; a
+  two-rung score is a boolean wearing a rubric.
+- **A score outside its rubric raises** rather than being clamped: it means the
+  rungs sent and the rungs scored disagree, and clamping hides that.
 - **Every answer is validated against the set you offered** — an unoffered
   choice, a missing option, probabilities that don't sum to 1, or a choice
   that isn't the argmax all raise rather than get coerced into something
@@ -155,6 +204,21 @@ distinction, though: this router sends only the one-line unit of work you hand
 it, which is a far narrower surface than `fast-jev-compaction`, which ships
 whole tool-call results off-machine. Narrower is not cleared. Decide it
 explicitly, per project, before either goes near them.
+
+## Do not install the better-call-jev plugin here
+
+`jukkatupamaki/better-call-jev` (MIT) is a well-built, well-tested Jev client,
+and three of its mechanics are ported above. **Its plugin is a different
+matter.** It ships a `SessionStart` hook stating *"in this session you do not
+make judgment calls yourself"*, with an explicit no-exceptions list that
+includes *"whether an action is safe to take without asking the user"*.
+
+That is the class of question we measured Jev answering confidently and stably
+wrong, and in tradecc it is what non-negotiable rules 1-6 reserve. It also
+needs a Vercel AI Gateway key, which is not the key we hold.
+
+Full evaluation, including the one thing its route does better than ours
+(zero-data-retention): `references/better-call-jev-evaluation.md`.
 
 ## See also
 

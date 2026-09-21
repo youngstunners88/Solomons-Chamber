@@ -77,6 +77,75 @@ OPTIONS_EVIDENCED = {
     ),
 }
 
+# --- v2: mechanism only -----------------------------------------------------
+#
+# v1 scored 86% but BROKE two cases that v0 got right, and both regressions
+# traced to the option text rather than the model. Two defects, both mine:
+#
+#   1. LEAKED POSITION SIZE. "$5-$10" appeared inside LATENCY_RACE's
+#      description -- and it is already in state.trader_profile. So a
+#      candidate that is ABOUT position size (capital-range increase) got
+#      pulled to latency by a word match. 5/5 -> 0/5.
+#
+#   2. NAMED INSTANCES. v1's DATA_INFRASTRUCTURE mentioned pump.fun by name,
+#      which should have made that case trivial and instead made it worse
+#      (5/5 -> 1/5). Naming instances turns a definition into a partial
+#      lookup table, and the centre of gravity of that description was the
+#      wallet-enumeration measurement -- a different candidate entirely. The
+#      named instance was a subordinate clause competing with a vivid
+#      framing elsewhere.
+#
+# v2 therefore states MECHANISM, the measured magnitude that makes it
+# binding, and a distinguishing test -- and names no candidate and no
+# position size anywhere.
+OPTIONS_MECHANISM = {
+    "LATENCY_RACE": (
+        "MECHANISM: the profit goes to whoever acts first, so the winner is decided by "
+        "proximity and execution speed rather than by analysis. "
+        "MAGNITUDE: professional participants are co-located and submit in microseconds; "
+        "a public RPC path is orders of magnitude behind. "
+        "TEST: would a participant who saw the same thing one second earlier take the "
+        "whole profit? If yes, this is the cause."
+    ),
+    "ADVERSE_SELECTION": (
+        "MECHANISM: we post a price and wait; the counterparty chooses whether to take it, "
+        "and chooses precisely when taking it is good for them and bad for us. "
+        "MAGNITUDE: loss-versus-rebalancing on a passive position exceeds the fee income "
+        "that is supposed to compensate for it. "
+        "TEST: do we QUOTE and wait, rather than take? If we are the passive side, this is "
+        "the cause."
+    ),
+    "DATA_INFRASTRUCTURE": (
+        "MECHANISM: the signal may well be real, but the history needed to test it honestly "
+        "cannot be obtained at our access level. This is a MEASUREMENT objection, never an "
+        "economic one. "
+        "MAGNITUDE: reconstructing a point-in-time-clean history at the cheapest available "
+        "throughput runs to thousands of hours; for some windows no historical route exists "
+        "at all and only forward collection works. "
+        "TEST: would buying paid, historical, point-in-time-clean data make this testable "
+        "again? If a cheque fixes it, this is the cause."
+    ),
+    "DETECTION_FLOOR": (
+        "MECHANISM: the effect is real but smaller than our measurement can resolve, so it "
+        "cannot be distinguished from noise at the sample we can gather. "
+        "MAGNITUDE: detecting an edge at 95% confidence and 80% power takes "
+        "7.8489 x (sigma/mu)^2 round trips, and the measured noise ratio here is 1.33-1.55. "
+        "Requirements above ~74% direction accuracy sit roughly twenty points beyond what is "
+        "achievable on liquid markets. "
+        "TEST: is the problem that we cannot PROVE the edge rather than that we cannot "
+        "obtain the data or reach the venue? If the blocker is statistical power, this is "
+        "the cause."
+    ),
+    "ESCAPES_ALL_FOUR": (
+        "MECHANISM: none of the four applies. The blocker is elsewhere -- the wrong venue, "
+        "a capital minimum, conduct, or no residual left after an existing router already "
+        "optimises it. "
+        "TEST: can you name a blocker that is NOT speed, NOT being the passive side, NOT "
+        "data availability and NOT statistical power? If so, choose this."
+    ),
+}
+
+
 # name -> (recorded cause, one-line description as a proposer would pitch it)
 CASES: list[tuple[str, str, str]] = [
     ("Cross-DEX arbitrage", "LATENCY_RACE",
@@ -150,22 +219,24 @@ def run_arm(label: str, options: dict[str, str]) -> dict:
 
 
 if __name__ == "__main__":
-    starved = run_arm("STARVED (cause names only)", OPTIONS_BARE)
-    supplied = run_arm("SUPPLIED (evidence inline)", OPTIONS_EVIDENCED)
+    starved = run_arm("STARVED  (names only)", OPTIONS_BARE)
+    supplied = run_arm("EVIDENCED (v1, leaks instances + size)", OPTIONS_EVIDENCED)
+    mechanism = run_arm("MECHANISM (v2, no instances, no size)", OPTIONS_MECHANISM)
 
     # Calibration: score the probability placed on the RECORDED answer, not on
     # whatever was chosen -- otherwise every miss is silently discarded.
     print("\n===== CALIBRATION (probability placed on the recorded answer) =====")
-    for arm in (starved, supplied):
+    for arm in (starved, supplied, mechanism):
         records = [cal.DecisionRecord(question=r["case"], predicted=r["p_on_recorded"],
                                       outcome=r["correct"]) for r in arm["rows"]]
         print(f"\n--- {arm['label']}")
         print(cal.format_report(cal.assess(records)))
 
     out = Path(__file__).with_name("backtest-intake-results.json")
-    out.write_text(json.dumps({"starved": starved, "supplied": supplied}, indent=1))
+    out.write_text(json.dumps({"starved": starved, "supplied": supplied,
+                               "mechanism": mechanism}, indent=1))
     print(f"\nwrote {out}")
-    print(f"\nDECISION RULE (fixed before running): adopt only if SUPPLIED >= 10/14 "
-          f"AND SUPPLIED > STARVED.\n  STARVED {starved['hits']}/14, "
-          f"SUPPLIED {supplied['hits']}/14 -> "
-          f"{'ADOPT' if supplied['hits'] >= 10 and supplied['hits'] > starved['hits'] else 'DO NOT ADOPT'}")
+    print(f"\nSTARVED {starved['hits']}/14 | EVIDENCED-v1 {supplied['hits']}/14 | "
+          f"MECHANISM-v2 {mechanism['hits']}/14")
+    print("PREDICTION under test: v2 keeps v1's gains AND restores capital-range "
+          "and pump.fun, which v1 broke.")

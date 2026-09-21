@@ -417,3 +417,86 @@ def test_cost_is_reported_when_the_route_supplies_it() -> None:
     None, never 0.0 -- free and unreported are different claims."""
     assert _result("jev-latest", "x", {"cost": 1.4868e-05}).cost_usd == pytest.approx(1.4868e-05)
     assert _result("jev-latest", "x", {}).cost_usd is None
+
+
+# --- per-action thresholds ---------------------------------------------------
+
+
+def answer(top: float, second: float, rest: float = 0.0) -> jev_client.Answer:
+    probs = {"A": top, "B": second}
+    if rest:
+        probs["C"] = rest
+    return jev_client._validate(
+        "q", {"choice": "A", "confidence": top, "probabilities": probs}, set(probs))
+
+
+def test_the_same_answer_passes_a_cheap_gate_and_fails_an_expensive_one() -> None:
+    """The whole point of a per-action table. One global threshold prices a log
+    line and a payment identically, and they are not identical."""
+    a = answer(0.45, 0.40, 0.15)
+    assert router.gate_action(a, "annotate").allowed is True
+    assert router.gate_action(a, "spend").allowed is False
+
+
+def test_filtering_is_gated_harder_than_ranking() -> None:
+    """A wrong rank costs a scroll; a wrong filter is INVISIBLE. They sound
+    like the same operation and their failure modes are not comparable."""
+    assert router.DEFAULT_GATES["filter"].min_margin > router.DEFAULT_GATES["rank"].min_margin
+
+
+def test_a_margin_exactly_at_its_threshold_passes() -> None:
+    """0.45 - 0.40 is 0.04999999999999999 in IEEE754. Without a tolerance a
+    margin that is exactly at its stated threshold is refused by rounding, and
+    that refusal gets blamed on the model rather than on arithmetic."""
+    a = answer(0.45, 0.40, 0.15)
+    assert a.margin < 0.05  # the float really is below the nominal value
+    assert router.gate_action(a, "annotate").allowed is True
+
+
+def test_a_weak_leader_is_caught_even_with_a_healthy_margin() -> None:
+    """Margin alone is not enough, and this case isolates why: the lead over
+    the runner-up is comfortable while the leader itself commands barely a
+    third of the mass, spread thin across many options. Margin passes; the
+    confidence floor is the only thing that catches it.
+
+    (A first draft of this test used 0.30/0.10 x 7, which fails on MARGIN
+    first and so never exercised the confidence check at all -- it asserted
+    the right verdict for the wrong reason.)"""
+    probs = {"A": 0.35, "B": 0.05}
+    probs.update({chr(ord("C") + i): 0.05 for i in range(12)})
+    a = jev_client._validate("q", {"choice": "A", "confidence": 0.35,
+                                   "probabilities": probs}, set(probs))
+    gate = router.DEFAULT_GATES["filter"]
+    assert a.margin == pytest.approx(0.30)
+    assert a.margin >= gate.min_margin, "precondition: the MARGIN check must pass"
+    result = router.gate_action(a, "filter")
+    assert result.allowed is False
+    assert "confidence" in result.reason
+
+
+def test_an_unknown_action_raises_rather_than_defaulting() -> None:
+    """Falling back to a permissive default would mean a typo in an action
+    name silently lowers the bar -- the one failure a threshold table exists
+    to prevent."""
+    with pytest.raises(KeyError, match="no gate defined"):
+        router.gate_action(answer(0.99, 0.01), "delete_everything")
+
+
+def test_an_irreversible_action_cannot_be_gated_below_the_default() -> None:
+    """Caught at construction, not in production. An irreversible action with
+    a looser bar than a reversible one is a mistake in the table every time."""
+    with pytest.raises(ValueError, match="irreversible"):
+        router.ActionGate("wipe", 0.10, 0.10, "oops", reversible=False)
+
+
+def test_a_threshold_outside_zero_to_one_is_refused() -> None:
+    with pytest.raises(ValueError, match=r"not in \[0, 1\]"):
+        router.ActionGate("x", 1.5, 0.5, "oops")
+
+
+def test_the_default_table_orders_gates_by_cost_of_being_wrong() -> None:
+    """The table is meant to be read as a ladder. If someone reorders it
+    without thinking, this says so."""
+    ladder = ["annotate", "rank", "filter", "spend", "irreversible"]
+    margins = [router.DEFAULT_GATES[a].min_margin for a in ladder]
+    assert margins == sorted(margins), f"gates are not monotone in cost: {margins}"

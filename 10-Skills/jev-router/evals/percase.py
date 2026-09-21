@@ -9,9 +9,11 @@ from jev_client import JevInvalidAnswer, Question, ask
 inconsistent = []
 
 REPS = 5
-tally = {arm: collections.defaultdict(list) for arm in ("STARVED", "SUPPLIED")}
+ARMS = (("STARVED", "OPTIONS_BARE"), ("EVIDENCED", "OPTIONS_EVIDENCED"), ("MECHANISM", "OPTIONS_MECHANISM"))
+tally = {a: collections.defaultdict(list) for a, _ in ARMS}
 for _ in range(REPS):
-    for arm, opts in (("STARVED", bt.OPTIONS_BARE), ("SUPPLIED", bt.OPTIONS_EVIDENCED)):
+    for arm, attr in ARMS:
+        opts = getattr(bt, attr)
         for name, recorded, pitch in bt.CASES:
             try:
                 r = ask({"candidate": {"name": name, "what_it_does": pitch},
@@ -29,19 +31,21 @@ for _ in range(REPS):
             a = r.answers["cause"]
             tally[arm][name].append(a.choice == recorded)
 
-print(f"{'case':<44} {'STARVED':>9} {'SUPPLIED':>9}   recorded")
+print(f"{'case':<42} {'STARVE':>7} {'EVID':>6} {'MECH':>6}   recorded")
 flips = []
 for name, recorded, _ in bt.CASES:
-    s = sum(tally['STARVED'][name]); p = sum(tally['SUPPLIED'][name])
-    if 0 < p < REPS: flips.append(name)
-    print(f"{name[:43]:<44} {s}/{REPS:<7} {p}/{REPS:<7}   {recorded}")
-st = sum(sum(v) for v in tally['STARVED'].values())
-su = sum(sum(v) for v in tally['SUPPLIED'].values())
+    a = sum(tally['STARVED'][name]); b = sum(tally['EVIDENCED'][name])
+    c = sum(tally['MECHANISM'][name])
+    if 0 < c < REPS: flips.append(name)
+    print(f"{name[:41]:<42} {a}/{REPS:<5} {b}/{REPS:<4} {c}/{REPS:<4}   {recorded}")
 tot = REPS * len(bt.CASES)
-print(f"\npooled: STARVED {st}/{tot} ({st/tot:.0%})   SUPPLIED {su}/{tot} ({su/tot:.0%})")
-print(f"cases never right when SUPPLIED: "
-      f"{[n for n,_,_ in bt.CASES if sum(tally['SUPPLIED'][n])==0] or 'none'}")
-print(f"cases that flip under SUPPLIED (unstable): {flips or 'none'}")
-print(f"\nself-inconsistent responses (choice != own argmax): {len(inconsistent)} of {2*tot}")
+print()
+for arm, _ in ARMS:
+    hit = sum(sum(v) for v in tally[arm].values())
+    print(f"pooled {arm:<10} {hit}/{tot} ({hit/tot:.0%})")
+print(f"\ncases never right under MECHANISM: "
+      f"{[n for n,_,_ in bt.CASES if sum(tally['MECHANISM'][n])==0] or 'none'}")
+print(f"cases that flip under MECHANISM (unstable): {flips or 'none'}")
+print(f"\nself-inconsistent responses (choice != own argmax): {len(inconsistent)} of {len(ARMS)*tot}")
 for arm, name, msg in inconsistent:
     print(f"  {arm:<9} {name[:40]:<41} {msg}")

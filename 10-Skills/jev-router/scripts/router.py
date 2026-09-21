@@ -242,3 +242,125 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# --- per-action thresholds ---------------------------------------------------
+#
+# A single global MIN_MARGIN is wrong, and the back-test shows why: the model's
+# errors are not uniformly distributed, so neither should the bar be. Pulling
+# back from a decision costs almost nothing; acting on a wrong one can cost a
+# great deal. One threshold for both prices them the same.
+#
+# The rule is: set the bar by what being WRONG costs, not by how confident the
+# model sounds. Two actions with identical 0.7 confidence deserve different
+# treatment when one is a log line and the other spends money.
+
+
+@dataclass(frozen=True)
+class ActionGate:
+    """A threshold attached to a consequence rather than to a model.
+
+    `min_margin` is the lead the top option needs over the runner-up.
+    `min_confidence` is an additional floor on the top option itself: a
+    three-way 0.34/0.33/0.33 split has a tiny margin AND a weak leader, while
+    0.60/0.26/0.14 has a healthy margin on a leader that is still not a
+    majority. Requiring both catches each case.
+    """
+
+    action: str
+    min_margin: float
+    min_confidence: float
+    why: str
+    reversible: bool = True
+
+    def __post_init__(self) -> None:
+        for field_name in ("min_margin", "min_confidence"):
+            value = getattr(self, field_name)
+            if not 0.0 <= value <= 1.0:
+                raise ValueError(f"{self.action}: {field_name}={value} is not in [0, 1]")
+        # An irreversible action gated more loosely than a reversible one is
+        # almost always a mistake in the table rather than a deliberate choice,
+        # so it is refused at construction rather than found in production.
+        if not self.reversible and self.min_margin < MIN_MARGIN:
+            raise ValueError(
+                f"{self.action}: irreversible actions may not sit below the default "
+                f"margin of {MIN_MARGIN}; got {self.min_margin}"
+            )
+
+
+# The default table. Ordered by what a wrong answer costs, cheapest first.
+# Projects are expected to replace this wholesale -- it is an example of the
+# shape, not a universal truth.
+DEFAULT_GATES: dict[str, ActionGate] = {
+    "annotate": ActionGate(
+        "annotate", 0.05, 0.20,
+        "Writing a note beside a human verdict. A wrong one is read and ignored.",
+    ),
+    "rank": ActionGate(
+        "rank", 0.10, 0.25,
+        "Ordering candidates a human will scan anyway. Being wrong costs a scroll.",
+    ),
+    "filter": ActionGate(
+        "filter", 0.25, 0.40,
+        "Dropping a candidate from view. A wrong drop is INVISIBLE, which is why "
+        "this sits well above ranking despite sounding similar.",
+    ),
+    "spend": ActionGate(
+        "spend", 0.50, 0.65,
+        "Committing money or a scarce budget. Recoverable, but only by spending again.",
+        reversible=False,
+    ),
+    "irreversible": ActionGate(
+        "irreversible", 0.80, 0.85,
+        "Anything that cannot be undone. In practice this should almost always "
+        "escalate instead -- the bar is set high enough to say so.",
+        reversible=False,
+    ),
+}
+
+
+# Thresholds are compared inclusively, with a tolerance, because probabilities
+# arrive as floats and 0.45 - 0.40 is 0.04999999999999999 in IEEE754. Without
+# this, a margin that is exactly at its stated threshold is refused by rounding
+# noise -- and that refusal gets blamed on the model rather than on arithmetic.
+_BOUNDARY_TOLERANCE = 1e-9
+
+
+@dataclass(frozen=True)
+class GateResult:
+    action: str
+    allowed: bool
+    choice: str
+    margin: float
+    confidence: float
+    reason: str
+
+
+def gate_action(answer: Answer, action: str,
+                gates: dict[str, ActionGate] | None = None) -> GateResult:
+    """Decide whether this answer is strong enough to take THIS action.
+
+    An unknown action is refused rather than defaulted. Falling back to a
+    permissive default would mean a typo in the action name silently lowers
+    the bar, which is the one failure mode a threshold table exists to prevent.
+    """
+    table = gates if gates is not None else DEFAULT_GATES
+    gate = table.get(action)
+    if gate is None:
+        raise KeyError(
+            f"no gate defined for action {action!r}; known actions are "
+            f"{sorted(table)}. Add one rather than relying on a default -- "
+            f"an undefined action has an unstated cost of being wrong."
+        )
+
+    if answer.margin + _BOUNDARY_TOLERANCE < gate.min_margin:
+        return GateResult(action, False, answer.choice, answer.margin, answer.confidence,
+                          f"margin {answer.margin:.2f} < {gate.min_margin:.2f} required "
+                          f"for {action!r} ({gate.why})")
+    if answer.confidence + _BOUNDARY_TOLERANCE < gate.min_confidence:
+        return GateResult(action, False, answer.choice, answer.margin, answer.confidence,
+                          f"confidence {answer.confidence:.2f} < {gate.min_confidence:.2f} "
+                          f"required for {action!r} ({gate.why})")
+    return GateResult(action, True, answer.choice, answer.margin, answer.confidence,
+                      f"margin {answer.margin:.2f} and confidence {answer.confidence:.2f} "
+                      f"both clear the bar for {action!r}")

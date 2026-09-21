@@ -47,10 +47,16 @@ Three requests in one session, all landing in this vault:
 
 ### ✅ Accomplished
 
-**Jev is NOT on OpenRouter.** Checked the live model list: 446 models, zero
-matching jev/typesafe/systemone. The real pairing is Jev for structured
-decisions plus an OpenAI-compatible endpoint (OpenRouter) for prose — which is
-what `jev-ultrafast` already does via `TEXT_MODEL_BASE_URL`.
+~~**Jev is NOT on OpenRouter.** Checked the live model list: 446 models, zero
+matching jev/typesafe/systemone.~~ **← WRONG. Corrected 2026-09-21, see §5
+below.** Jev IS on OpenRouter as `jev-latest`; decisions models are simply not
+listed in `/v1/models`. The struck text is left in place because this is a log
+and the mistake is the record, but it must not be read as a finding.
+
+The pairing with a text model for prose (what `jev-ultrafast` does via
+`TEXT_MODEL_BASE_URL`) is real and unaffected — but it is a division of
+labour between two *kinds* of work, not, as originally written, between two
+vendors.
 
 **Wire contract recovered by probing**, since the docs describe the tools built
 on Jev rather than Jev itself. Three question types work on the direct

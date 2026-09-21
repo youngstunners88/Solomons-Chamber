@@ -1,4 +1,4 @@
-# TASK LOG - Jev router, better-call-jev port, and bot 117
+# TASK LOG - Jev router, better-call-jev port, bot 117, calibration, back-test
 
 ## Status: ✅ COMPLETE (awaiting review on PR #1)
 
@@ -105,5 +105,94 @@ rather than back-dating it.
 ## Started At
 2026-09-20T13:20Z (approx — reconstructed)
 
+---
+
+# CONTINUED — 2026-09-21
+
+Four further requests landed on the same branch. Logged here rather than in a
+new file because they are the same body of work on the same PR.
+
+## 5. "Jev is on openrouter you clown ~typesafe/jev-latest"
+
+**The user was right and I was wrong.** I had asserted in six places that Jev
+was not reachable through OpenRouter. The check behind it searched
+`/v1/models` for "jev", found nothing among 446 entries, and stopped.
+Decisions models are not in that catalogue. One POST to chat/completions says
+so outright.
+
+Both routes verified live. Measured over five calls each, OpenRouter is the
+FASTER path (347ms median against 396ms direct), reports per-call cost, and
+returns a fully pinned version string. `DEFAULT_ROUTE` is now OpenRouter.
+
+Corrected in: `SKILL.md`, `measured-behaviour.md`,
+`better-call-jev-evaluation.md`, `router.py`, one test, and the PR body.
+Grepped tradecc for the same claim — zero mentions, it never propagated.
+
+**Root cause: I trusted a catalogue over a probe, while shipping a skill whose
+central lesson is that Jev is wrong when the deciding fact is absent. Same
+error, one level up.**
+
+## 6. CI, and the five phantom submodules it found
+
+Added `.github/workflows/test.yml` — the repo had none, so every "tests pass"
+claim was unverifiable. Its first run surfaced
+`fatal: No url found for submodule path ...`, which turned out to be **five**
+gitlinks with no `.gitmodules` at all, all from commit `a22f527` in April.
+Every directory empty, every referenced commit unresolvable. A recursive clone
+had been failing for five months and nothing said so.
+
+## 7. Calibration verification
+
+`scripts/calibration.py`. Brier, log loss, ECE, reliability table — and a
+verdict that stays UNDERPOWERED until two bins clear a derived floor of
+`(1.96/(2*tolerance))^2` per bin (97 for a 10-point error). Twenty flawless
+decisions look like proof and are not.
+
+## 8. Read-only audit + the back-test
+
+Audited every repo here for Jev opportunities (read-only, nothing changed).
+Recommended and then ran the one candidate with reviewed examples already in
+hand: TradeCC's `repo-intake` step 2, 14 recorded verdicts, two arms, five
+repeats, 140 calls, under $0.005.
+
+**STARVED 44/70 (63%) · SUPPLIED 60/70 (86%).** Ranges do not overlap. Adopted
+as a second opinion only, never as the verdict.
+
+The finding worth keeping is not the headline: evidence fixed five cases and
+**broke two**, and both regressions trace to my own prompt. I put "$5-$10"
+inside the LATENCY_RACE description; the capital-range candidate is *about*
+position size; it went 5/5 to 0/5. **Option descriptions are code.**
+
+## Files added since the first entry
+
+| File | Action |
+|------|--------|
+| `.github/workflows/test.yml` | Create |
+| `10-Skills/jev-router/scripts/calibration.py` | Create |
+| `10-Skills/jev-router/tests/test_calibration.py` | Create |
+| `10-Skills/jev-router/evals/backtest_intake.py` | Create |
+| `10-Skills/jev-router/evals/percase.py` | Create |
+| `10-Skills/jev-router/evals/RESULTS-2026-09-21.md` | Create |
+| `10-Skills/jev-router/scripts/jev_client.py` | Modify (routes, pinning) |
+| five phantom gitlinks | Remove |
+
+## Mistakes added to the tally
+
+4. **Claimed Jev was not on OpenRouter**, from a catalogue search, in six
+   places. The user had to correct me.
+5. **Built a prompt attractor** and then measured the model falling into it.
+
+Root cause of both, and of the three in the first entry: **acting on an
+assumed behaviour instead of a probed one.**
+
+## Still open, not started — waiting on the user
+
+- Fix the two prompt attractors and re-run the back-test (~$0.005, clear
+  prediction: capital-range returns to 5/5).
+- pump.fun 5/5 to 1/5 under SUPPLIED is **unexplained**.
+- Per-action confidence thresholds, rather than one global margin.
+- Hydra wallet scoring is the strongest technical fit for Jev and is
+  **blocked** on the data-egress decision, which is the user's to make.
+
 ## Completed At
-2026-09-20T15:40Z
+2026-09-20T15:40Z (first entry) · 2026-09-21T05:15Z (this continuation)

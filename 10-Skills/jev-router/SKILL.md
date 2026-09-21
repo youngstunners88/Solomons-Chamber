@@ -40,6 +40,10 @@ usage: |
   # Why we ported better-call-jev's mechanics but not its plugin
   cat 10-Skills/jev-router/references/better-call-jev-evaluation.md
 
+  # Score logged decisions against what actually happened
+  python3 -c "import sys; sys.path.insert(0,'10-Skills/jev-router/scripts'); \
+import calibration as c; print(c.format_report(c.assess(c.DecisionLog('decisions.jsonl').records())))"
+
   # Tests (no network)
   pytest 10-Skills/jev-router/tests/
 ---
@@ -216,6 +220,43 @@ distinction, though: this router sends only the one-line unit of work you hand
 it, which is a far narrower surface than `fast-jev-compaction`, which ships
 whole tool-call results off-machine. Narrower is not cleared. Decide it
 explicitly, per project, before either goes near them.
+
+## Borrowed calibration is borrowed trust
+
+Jev is trained with RLCD, which optimises probabilities against real outcomes.
+That is a claim about **TypeSafe's** distribution, not ours. Until the curve is
+checked on the questions this project actually asks, a confidence gate is
+decorative.
+
+`scripts/calibration.py` does the checking: log every decision with
+`DecisionRecord`, resolve the outcome later, then `assess()` returns Brier, log
+loss, ECE and a reliability table.
+
+**The part that matters is what it refuses to say.** Every metric here is noise
+at small n, and small n is exactly where people quote them. So the report
+carries a verdict, and it is `UNDERPOWERED` until at least two bins
+individually clear the sample floor — derived, not picked:
+
+```
+n >= (1.96 / (2 * tolerance))^2   per bin
+     = 97 to resolve a 10-point error, 385 for a 5-point one
+```
+
+Twenty flawless decisions look like proof and are not; a perfectly calibrated
+model and a lucky one are indistinguishable at that size. A test pins exactly
+that case.
+
+Two further choices worth knowing:
+
+- **The baseline is the base rate, not 0.5.** Always-0.5 scores 0.25, but the
+  free competitor is predicting the actual base rate. On skewed outcomes that
+  is much harder to beat, and using 0.25 would flatter the model.
+- **Score the probability of the outcome that resolved**, not of whatever was
+  chosen. Scoring only the chosen option measures confidence-when-right and
+  discards every miss.
+
+If the curve bends, the fix is Platt scaling in the policy layer — not a
+different threshold on a number that does not mean what it says.
 
 ## Do not install the better-call-jev plugin here
 

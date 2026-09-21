@@ -191,14 +191,69 @@ position size; it went 5/5 to 0/5. **Option descriptions are code.**
 Root cause of both, and of the three in the first entry: **acting on an
 assumed behaviour instead of a probed one.**
 
+## 9. The attractor fix — and the prediction it falsified
+
+Done, and the prediction in the previous section was **wrong**. Third arm,
+210 calls total:
+
+| Arm | Option descriptions contained | Pooled |
+|---|---|---|
+| STARVED | cause names and a one-line gloss | 41/70 (59%) |
+| **EVIDENCED** | plus specific measured facts | **60/70 (86%)** |
+| MECHANISM (v2) | clean definitions, no named instances | 52/70 (74%) |
+
+v2 came in **twelve points below** the version it was meant to improve,
+repaired neither regression, and broke two more (copy-trading 5/5 to 2/5,
+statistical arbitrage 5/5 to 0/5). capital-range did **not** return to 5/5.
+
+I had called the named examples a defect and removed them. They were doing
+real work as few-shot anchors. **The tidier text reads better to a human and
+performs worse.** v2 is kept in the file as the falsified alternative.
+
+Two contaminants survive and are still worth avoiding: duplicating a fact
+already in `state` into one option, and naming an instance in a paragraph
+dominated by a different case.
+
+capital-range and pump.fun are wrong in every evidenced arm because their
+recorded answers **are not derivable from the candidate description** — a flaw
+in the eval, not the model. Excluding them gives 59/60; that figure is
+post-hoc and **must not be quoted**.
+
+## 10. Per-action gates, and a float bug underneath them
+
+`router.DEFAULT_GATES`: annotate 0.05 / rank 0.10 / filter 0.25 / spend 0.50 /
+irreversible 0.80, ordered by what being wrong costs. `filter` sits above
+`rank` although they sound alike — a wrong rank costs a scroll, a wrong filter
+is invisible. Unknown action raises; irreversible cannot be gated below the
+default.
+
+`0.45 - 0.40` is `0.04999999999999999`, so a margin exactly at threshold was
+refused by float noise — and that refusal would have been blamed on the model.
+Inclusive within `1e-9`, with a test.
+
+One test was wrong before it was right: the weak-leader case fails on MARGIN
+first, so it asserted the right verdict for the wrong reason and never
+exercised the confidence floor. Rewritten.
+
+## 11. New skill: `10-Skills/jev-prompt-design`
+
+Option descriptions are code. Six-point checklist ending "have you measured
+this, rather than decided it reads better" — the item that would have caught
+§9's wrong prediction.
+
+## Mistake 6
+
+6. **Predicted the attractor fix would work, confidently, and it made things
+   worse.** Same root cause as the rest, one level out: reasoning about a
+   behaviour instead of measuring it.
+
 ## Still open, not started — waiting on the user
 
-- Fix the two prompt attractors and re-run the back-test (~$0.005, clear
-  prediction: capital-range returns to 5/5).
-- pump.fun 5/5 to 1/5 under SUPPLIED is **unexplained**.
-- Per-action confidence thresholds, rather than one global margin.
+- pump.fun 5/5 to 1/5 is still **unexplained**.
+- A **pre-registered** re-run excluding the two unanswerable cases. The 59/60
+  figure stays unquotable until then.
 - Hydra wallet scoring is the strongest technical fit for Jev and is
   **blocked** on the data-egress decision, which is the user's to make.
 
 ## Completed At
-2026-09-20T15:40Z (first entry) · 2026-09-21T05:15Z (this continuation)
+2026-09-20T15:40Z (first entry) · 2026-09-21T08:30Z (this continuation)

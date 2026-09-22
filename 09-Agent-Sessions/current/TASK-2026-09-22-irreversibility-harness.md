@@ -119,3 +119,95 @@ wall-clock expiry test failed, which is how it was found.
 
 ## Completed At
 2026-09-22T00:55Z
+
+---
+
+# CONTINUED — laya-mlx deep dive + decision-cascade
+
+## User Command (Exact Quote)
+> "I want you to deep dive this repo and to see how we could use this
+> https://github.com/mizorewww/laya-mlx.git then create the necessary skill. I
+> want us to see how we can leverage this to our advantage specially when it
+> comes to high frequency, trading, and rapid assessment. I want you to also do
+> a deep analysis on all of the two we have in our environment so that you can
+> also create strategies leveraging them to find the best edges that we can."
+
+## The headline finding
+
+**Laya and Jev are the same architecture family.** Identical primitives
+(`QTYPES = {"choice": 0, "score": 1, "noul": 2}`), same "System 1 / System One"
+framing, same RLCD training. `noul` is not a word two projects reach
+independently. Laya is Apache-2.0 with open weights on Hugging Face.
+
+So the decision lane we rent per call has an open-weight twin.
+
+## The finding that kills the obvious plan
+
+"Run it locally, 10ms instead of 347ms" does not survive the numbers:
+
+| Path | Latency | Runs here? |
+|---|---|---|
+| Jev via OpenRouter | 347 ms (our measurement) | yes |
+| Laya PyTorch CPU | 193–464 ms (upstream) | yes, with torch |
+| Laya PyTorch T4 GPU | 32.8 ms (upstream) | needs CUDA |
+| laya-mlx M3 Max | 10.9–17.8 ms / 7.4–13.4 ms | **no — Apple Silicon only** |
+
+1. **On CPU, local is SLOWER than remote.** Break-even goes negative.
+2. MLX is only ~20–25% over PyTorch on the same Apple hardware — the order of
+   magnitude is *local vs network*, not MLX. We don't need Apple Silicon for
+   the main benefit; we need a GPU.
+3. The repo's README and BENCHMARKS.md **disagree** on the same config.
+   Recorded; neither used as a default.
+
+Verified not assumed: `import mlx` → ModuleNotFoundError; dependency is gated
+`sys_platform=='darwin' and platform_machine=='arm64'`.
+
+## Built: `10-Skills/decision-cascade/` (33 tests)
+
+Jev chose LATENCY_CASCADE (0.93, margin 0.87) over THROUGHPUT_SCREENER (0.000),
+LOCAL_WEIGHTS_UNBLOCK (0.06) and HFT_EXECUTION_PATH (0.01).
+
+Centrepiece is the break-even formula `p < 1 − L1/L2`: a cheap tier at half the
+latency must resolve over half of calls or it is strictly slower AND dearer
+than not existing. `verdict()` returns DELETE when the cheap tier isn't cheaper
+— which is exactly our CPU case.
+
+Also: deadline accounting before each call, margin AND confidence gating, and
+`probe()` that reports what the host can actually run with
+`suggested_latency_ms` always None (a test pins that) so no budget is ever
+copied from someone else's README.
+
+## Mistakes and corrections this session
+
+7. **My mutation harness produced a false NOT-CAUGHT.** Same-length edits inside
+   one mtime second left stale `.pyc` files valid, so the mutant never ran.
+   Fixed by purging `__pycache__` between runs. Errs safe (under-reports
+   coverage) but was reporting a gap that did not exist.
+8. **A test asserted the right verdict for the wrong reason — again.**
+   `test_a_value_exactly_on_the_threshold_clears` set `min_confidence=0.0`, so
+   it only ever exercised the margin tolerance; a mutation inverting the
+   confidence tolerance survived it. Split into three tests covering both
+   fields and the "tolerance is not a free pass" case. This is the second time
+   this exact flaw has appeared (first: the weak-leader gate test).
+
+Final: **15/15 mutants caught** across both skills once pairings were correct.
+
+## Edge analysis delivered
+
+`references/edge-strategies.md`. Two findings eliminate most obvious answers:
+LATENCY_RACE blocks 7/14 recorded strategies and no model speed touches it; and
+a decision model cannot manufacture an edge absent from its input (measured:
+59%→86% from evidence, and two cases unanswerable in every arm).
+
+Five edges that survive, first three needing no hardware/vendor/egress:
+exit ratchet (built), reason codes on entries, turnover braking, calibration at
+volume (blocked on hardware), throughput screening (blocked on hardware).
+
+Senpi's own README says the exit asymmetry — not the entry signal — is "the
+engine behind every strategy template" across 114 packages.
+
+## Open question for the user
+Is a GPU or Apple Silicon machine available? Edges 4 and 5 turn entirely on it.
+
+## Completed At
+2026-09-22T04:40Z

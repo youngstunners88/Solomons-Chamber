@@ -211,3 +211,66 @@ Is a GPU or Apple Silicon machine available? Edges 4 and 5 turn entirely on it.
 
 ## Completed At
 2026-09-22T04:40Z
+
+---
+
+# CONTINUED — jevify methodology + the measured batching envelope
+
+## User Command (Exact Quote)
+> "Ok continue. Also are we better off than where we were a week ago? I want
+> you to deep dive this repo ... https://github.com/ryana/jevify ... especially
+> when it comes to rapid assessment ... Expand upon the build."
+
+Mid-turn: > "I don't have a gpu or apple machine so let's create a workaround
+even if it means we have to fork it so that it works for us"
+
+## What jevify turned out to be
+Not a codebase — ONE file, one commit: an investigation *methodology* for
+finding where Jev pays off in a project. Its operative instruction: "Do not
+assume that more questions are free, that batching scales indefinitely, or
+that provider-side parallelism eliminates client-visible costs."
+
+So I tested it instead of reading more.
+
+## The measurement (pre-registered)
+
+P1: latency at N=32 > 1.5x N=1 (vendor overselling) -> **FALSIFIED**, 1.05x.
+P2: sub-linear, <8x -> HELD.
+P3: options cost latency -> HELD weakly, 1.19x for 100x options.
+
+**Second confidently-wrong prediction in this PR.** I expected marketing
+overreach and pre-registered it. The vendor claim held.
+
+Then composition FAILED: 32q x 100 options -> HTTP 400 max_tokens_exceeded.
+Binary search found the real envelope: two ceilings (255 options/question,
+documented; ~2,500 option-judgements/request, a token budget) plus a latency
+cliff at 32 questions (5.7x slower than 16 for identical total work).
+
+Optimum: 16 x 159 = 2,544 judgements in 1,551ms = **1,640/second**.
+
+## Built: 10-Skills/rapid-assessment (26 tests, 4 mutants caught)
+Planner encoding the measured envelope. **Validated live, 8/8, never lets a
+400 through**; its one disagreement is refusing a working-but-cliff shape.
+
+## The no-GPU answer
+You don't need one. 1,640 judgements/s measured here with no accelerator; a T4
+running Laya unbatched gives ~30 decisions/s. Batching beats the GPU for
+throughput. A GPU/local only buys EGRESS (the Hydra blocker), which is a
+confidentiality question not a speed one. ONNX int8 CPU path designed in
+references/onnx-cpu-workaround.md, explicitly NOT measured, with the cheap
+decisive first test named.
+
+## Defect found in our own client
+`jev_client.Question` requires >=2 criteria, so it can express `choice` but NOT
+`noul` or `score` — a third of Jev's API is unreachable from this vault. The
+experiment had to use 2-option choices as stand-in booleans. Not yet fixed.
+
+## Also learned from the docs (never previously read)
+- 255 options/choice max; score takes 2-10 levels.
+- Nine documented failure modes (jev-1.13 jaggedness): not a calculator, reads
+  dates as text not ordered quantities, accuracy falls with irrelevant state,
+  not hostile to injection by default.
+- Cookbooks already do 218 line-scores/request and 182-candidate selection.
+
+## Completed At
+2026-09-22T14:10Z

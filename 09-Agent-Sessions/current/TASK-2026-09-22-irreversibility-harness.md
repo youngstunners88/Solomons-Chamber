@@ -274,3 +274,31 @@ experiment had to use 2-option choices as stand-in booleans. Not yet fixed.
 
 ## Completed At
 2026-09-22T14:10Z
+
+---
+
+# CONTINUED — accuracy at width + measure-first
+
+> "Run the accuracy at with experiment... use Jeff to figure out the most
+> optimal ways for us to keep building forward... build a skill around this for
+> every single session"
+
+## Accuracy at width: BOTH predictions falsified
+Widths 5/25/100/255, 14 cases x 3 repeats, 168 calls:
+88.1% / 92.9% / 88.1% / 85.7%. Predicted >=20pt drop by 255; got 2.4pt.
+Predicted confidence would fall; it rose (0.600 -> 0.616).
+**255-way ranking is verdict-grade.** Caveat: distractors were variants of 12
+stems; adversarially-similar options still unmeasured.
+
+## Jev: MEASURE_FIRST_PROTOCOL (0.92, margin 0.84)
+SHIP_VELOCITY and CONSOLIDATE_AND_HARDEN both 0.000.
+
+## Built: 10-Skills/measure-first (12 tests)
+Seal-before-you-look registry. grade() raises on unsealed claims; re-seal and
+re-grade both raise; ungraded seals surfaced; zero-falsifications flagged as
+suspicious rather than celebrated.
+
+## Running tally: 3 of 4 pre-registered predictions falsified.
+
+## Completed At
+2026-09-22T15:30Z

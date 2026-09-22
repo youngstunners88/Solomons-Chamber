@@ -131,10 +131,25 @@ ones — a conditional second round trip costs more than the extra questions do.
 - **Jev is documented as unreliable at maths, counting, and date ordering**
   (`model-jaggedness/jev-1.13`). Do not put arithmetic in a rubric and expect it
   to hold.
-- **Accuracy at 255 options is UNMEASURED.** Everything above is capacity, not
-  quality. Wide option sets plausibly degrade discrimination, and the honest
-  test is the existing three-arm back-test harness run at varying widths. Until
-  then, treat a 255-way ranking as a screen, not a verdict.
+- **Accuracy at width is now MEASURED, and it holds.** 14 recorded cases, 3
+  repeats, widths 5 / 25 / 100 / 255 with the real answer padded by plausible
+  distractors:
+
+  | Width | Accuracy | Mean confidence |
+  |---|---|---|
+  | 5 | 88.1% | 0.600 |
+  | 25 | **92.9%** | 0.633 |
+  | 100 | 88.1% | 0.643 |
+  | 255 | 85.7% | 0.616 |
+
+  I pre-registered that accuracy would fall **at least 20 points** by 255. It
+  fell **2.4**. Also predicted confidence would drop as mass spread over more
+  options; it did not (0.600 -> 0.616). **Both falsified.** A 255-way ranking is
+  verdict-grade, not merely a screen.
+
+  Caveat: the 250 distractors are variants of 12 stems, so they may be easier to
+  reject than genuinely confusable options. Accuracy against *adversarially
+  similar* options is still unmeasured.
 
 ## See also
 

@@ -22,6 +22,9 @@ usage: |
 
   # The full measurement, including the prediction I got wrong
   cat 10-Skills/rapid-assessment/references/measured-envelope.md
+
+  # Option order flips the verdict on 29% of cases; average it out
+  cat 10-Skills/rapid-assessment/references/order-sensitivity.md
 ---
 
 # Rapid assessment
@@ -151,9 +154,43 @@ ones — a conditional second round trip costs more than the extra questions do.
   reject than genuinely confusable options. Accuracy against *adversarially
   similar* options is still unmeasured.
 
+## Option ORDER changes the answer — average it out
+
+Measured 2026-09-22, 168 live answers: **the argmax flips on 29% of cases at
+width 25 and 36% at width 5**, purely from the order the options are listed in.
+Accuracy is unchanged (92.9% either way at width 25) — so this is a
+*reproducibility* defect, not an accuracy one. The verdict we ship depends on
+how a dict literal happened to be written.
+
+```python
+from permute import orderings, aggregate, max_permutations_for
+
+orders = orderings(labels, 6)              # ordering 0 is YOUR order
+# ...send all 6 as separate questions in ONE request...
+result = aggregate(answers, labels)
+result.choice, result.mean_confidence, result.stable, result.spread
+```
+
+Six orderings of 25 options cost **496 ms in one request** — against ~507 ms for
+a single 255-option call. The batching envelope already paid for this.
+
+- `result.stable` is False when the orderings disagreed. Surface it; don't
+  average disagreement out of sight.
+- `mean_confidence` is the winner's **mean probability, not Jev's native
+  confidence**. Never mix averaged and single-order confidences in one
+  calibration bucket — the bucket would measure the mixture, not the model.
+- `max_permutations_for(width)` enforces `M x width <= 2,000`. pijev's default
+  of 8 would exceed the ceiling at width 255; ours is 6.
+
+Credit: the idea is [pijev](https://github.com/TypeLLM/pijev) (Apache-2.0). The
+package itself subclasses `typesafe_sdk` and cannot be used here, so only the
+mechanism was ported. Full method, the two falsified predictions, and the
+`choice != argmax` trap: `references/order-sensitivity.md`.
+
 ## See also
 
 - `references/measured-envelope.md` — full method, raw numbers, falsified prediction.
 - `references/jevify-audit.md` — the jevify methodology run against this workspace.
 - `10-Skills/decision-cascade/` — tiering and the break-even test.
 - `10-Skills/jev-prompt-design/` — evidence in option descriptions was worth 27 points.
+- `references/order-sensitivity.md` — option order flips the verdict on 29% of cases.

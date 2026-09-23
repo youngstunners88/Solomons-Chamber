@@ -61,12 +61,13 @@ from __future__ import annotations
 
 import random
 import statistics
-from dataclasses import dataclass
+from dataclasses import dataclass, field, replace
 from typing import Any, Mapping, Sequence
 
 from budget import MAX_OPTIONS_PER_QUESTION, SAFE_OPTION_JUDGEMENTS, BudgetError
 
-__all__ = ["PermutedChoice", "orderings", "max_permutations_for", "aggregate"]
+__all__ = ["PermutedChoice", "orderings", "max_permutations_for", "aggregate",
+           "ask_stable", "DEFAULT_PERMUTATIONS"]
 
 # pijev's default is 8. Ours is 6 because 6 is what was actually measured here,
 # and because M interacts with our token ceiling in a way pijev's 720-question
@@ -143,6 +144,7 @@ class PermutedChoice:
     flipped: bool                  # the orderings did not all agree
     picks: tuple[str, ...]         # each ordering's own pick, in order
     spread: float                  # max-min probability of the winning label
+    extra: dict[str, Any] = field(default_factory=dict)   # pass-through answers
 
     @property
     def margin(self) -> float:
@@ -203,3 +205,71 @@ def aggregate(answers: Sequence[Any], labels: Sequence[str]) -> PermutedChoice:
         picks=picks,
         spread=max(winner_probs) - min(winner_probs),
     )
+
+
+def ask_stable(
+    state: Mapping[str, Any],
+    question: Any,
+    *,
+    m: int = DEFAULT_PERMUTATIONS,
+    seed: int | None = None,
+    extra: Sequence[Any] = (),
+    ask: Any = None,
+    question_cls: Any = None,
+    **ask_kwargs: Any,
+) -> PermutedChoice:
+    """Ask ONE choice question under `m` option orderings, in ONE request.
+
+    This is the whole round trip: build the orderings, batch them as separate
+    questions against a single shared `state`, and label-align the answers back
+    into one verdict. `question` is a `jev_client.Question`.
+
+    `extra` carries questions that pass through UNPERMUTED -- booleans and
+    scores, which have no option order to vary. They ride the same request, so
+    adding them costs a question rather than a round trip, and they land in
+    `.extra` keyed by name.
+
+    `ask` and `question_cls` are injected so this module stays importable
+    without a network client and testable without one. They default to
+    `jev_client`'s, imported lazily so `budget`/`aggregate` users never pay for
+    it.
+
+    Returns a `PermutedChoice`, NOT a `jev_client.Answer`. That is deliberate:
+    the two carry different kinds of number. `Answer.confidence` is Jev's own
+    confidence; `PermutedChoice.mean_confidence` is the winning label's mean
+    probability. Returning the same type would make them silently
+    interchangeable at call sites, and mixing them in one calibration bucket
+    measures the mixture rather than the model.
+    """
+    if m < 1:
+        raise BudgetError("need at least one ordering")
+    if ask is None or question_cls is None:
+        from jev_client import Question as _Q, ask as _ask  # noqa: PLC0415
+        ask = ask or _ask
+        question_cls = question_cls or _Q
+
+    labels = list(question.criteria)
+    orders = orderings(labels, m, seed=seed)
+    names = [f"{question.name}__ord{i}" for i in range(len(orders))]
+    questions = [
+        question_cls(
+            name,
+            {lab: question.criteria[lab] for lab in order},
+            instructions=dict(question.instructions),
+        )
+        for name, order in zip(names, orders)
+    ]
+    taken = set(names)
+    for q in extra:
+        if q.name in taken:
+            raise BudgetError(
+                f"pass-through question {q.name!r} collides with a generated "
+                "ordering name"
+            )
+        taken.add(q.name)
+
+    result = ask(dict(state), [*questions, *extra], **ask_kwargs)
+    got = aggregate([result.answers[n] for n in names], labels)
+    if not extra:
+        return got
+    return replace(got, extra={q.name: result.answers[q.name] for q in extra})

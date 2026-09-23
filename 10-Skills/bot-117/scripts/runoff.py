@@ -18,10 +18,12 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, "/home/user/solomons-chamber/10-Skills/jev-router/scripts")
+sys.path.insert(0, "/home/user/solomons-chamber/10-Skills/rapid-assessment/scripts")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import world  # noqa: E402
 from jev_client import BooleanQuestion, Question, ask  # noqa: E402
+from permute import ask_stable  # noqa: E402
 
 WAGE_CEILING_PER_REAL_DAY = 72 * 120  # 72 world-days of 20 min, capped at 120 each
 
@@ -68,7 +70,14 @@ if __name__ == "__main__":
         print(f"  {r['name'][:22]:<23} {r['bits_a_day']:>6}/day  work explains "
               f"{r['share_from_work']:>4}  built={r['objects_built']:>3} sold={r['items_sold']:>4}")
 
-    result = ask(state, [
+    # Round 1 split this 0.42 / 0.35 -- a 0.07 margin, far under the 0.25 the
+    # router treats as decidable. That is exactly the regime where option ORDER
+    # decides the verdict: measured 2026-09-22, the argmax flips on 29% of
+    # cases at width 25 from ordering alone. Three options have six orderings,
+    # so this enumerates ALL of them -- the exact group average, not a sample.
+    # The two booleans have no option order to vary and ride along unpermuted.
+    primary = ask_stable(
+        state,
         Question("primary", {
             "WORK_MAX": "Concentrate on the bench. Capped but certain.",
             "BUILD_FOR_RECOGNITION": "Concentrate on building admired structures and "
@@ -77,28 +86,46 @@ if __name__ == "__main__":
                                    "as what the money is spent on — one strategy, not two.",
         }, instructions={"task": "Resolve round 1's tie using the decomposition. Which "
                                  "describes how 117 should actually operate?"}),
-        BooleanQuestion("work_alone_explains_the_top",
+        m=6,
+        extra=[
+            BooleanQuestion("work_alone_explains_the_top",
                         "Can working alone account for what the fastest bots earn per day? "
-                        "Compare each bot's worked_bits_per_day against its bits_a_day."),
-        BooleanQuestion("ceiling_is_binding",
-                        "Is the 8,640/real-day wage ceiling the binding constraint on how "
-                        "rich 117 can get, rather than effort or cleverness?"),
-    ])
+                            "Compare each bot's worked_bits_per_day against its bits_a_day."),
+            BooleanQuestion("ceiling_is_binding",
+                            "Is the 8,640/real-day wage ceiling the binding constraint on how "
+                            "rich 117 can get, rather than effort or cleverness?"),
+        ],
+    )
 
-    print(f"\n--- RUNOFF ({result.latency_ms} ms) ---")
-    for name, a in result.answers.items():
-        if hasattr(a, "choice"):
-            ranked = sorted(a.probabilities.items(), key=lambda kv: -kv[1])
-            print(f"  {name:<28} {a.choice:<22} margin {a.margin:.2f}  "
-                  f"[{'  '.join(f'{k}={v:.2f}' for k, v in ranked)}]")
-        else:
-            print(f"  {name:<28} {a.verdict:<22} p={a.probability:.2f}")
+    print(f"\n--- RUNOFF ({primary.orderings} orderings) ---")
+    ranked = sorted(primary.probabilities.items(), key=lambda kv: -kv[1])
+    print(f"  {'primary':<28} {primary.choice:<22} margin {primary.margin:.2f}  "
+          f"[{'  '.join(f'{k}={v:.2f}' for k, v in ranked)}]")
+    # Print the disagreement rather than averaging it out of sight. An unstable
+    # verdict is not necessarily wrong, but it IS one that depended on the order
+    # the options happened to be written in, and that belongs in the record.
+    if primary.flipped:
+        print(f"  {'':<28} UNSTABLE: orderings picked {sorted(set(primary.picks))}; "
+              f"winner's probability spanned {primary.spread:.2f}")
+    else:
+        print(f"  {'':<28} stable across all {primary.orderings} orderings "
+              f"(spread {primary.spread:.2f})")
+    for name, a in primary.extra.items():
+        print(f"  {name:<28} {a.verdict:<22} p={a.probability:.2f}")
 
     out = {
-        "primary": result.answers["primary"].choice,
-        "margin": round(result.answers["primary"].margin, 3),
-        "work_alone_explains_the_top": result.answers["work_alone_explains_the_top"].verdict,
-        "ceiling_is_binding": result.answers["ceiling_is_binding"].verdict,
+        "primary": primary.choice,
+        "margin": round(primary.margin, 3),
+        # NOT Jev's native confidence -- the winning label's mean probability
+        # over the orderings. Kept under a distinct name so it can never be
+        # pooled with a single-order confidence in one calibration bucket.
+        "mean_confidence": round(primary.mean_confidence, 3),
+        "orderings": primary.orderings,
+        "stable": primary.stable,
+        "picks_by_ordering": list(primary.picks),
+        "winner_probability_spread": round(primary.spread, 3),
+        "work_alone_explains_the_top": primary.extra["work_alone_explains_the_top"].verdict,
+        "ceiling_is_binding": primary.extra["ceiling_is_binding"].verdict,
         "decomposition": rows,
     }
     Path(__file__).with_name("runoff-verdict.json").write_text(json.dumps(out, indent=1))

@@ -163,13 +163,21 @@ Accuracy is unchanged (92.9% either way at width 25) — so this is a
 how a dict literal happened to be written.
 
 ```python
-from permute import orderings, aggregate, max_permutations_for
+from permute import ask_stable
 
-orders = orderings(labels, 6)              # ordering 0 is YOUR order
-# ...send all 6 as separate questions in ONE request...
-result = aggregate(answers, labels)
-result.choice, result.mean_confidence, result.stable, result.spread
+r = ask_stable(state, question, m=6, extra=[boolean_q])   # ONE request
+r.choice, r.mean_confidence, r.stable, r.spread, r.picks, r.extra
 ```
+
+`extra` carries booleans and scores, which have no option order to vary. They
+ride the same request, so they cost a question rather than a round trip.
+Lower-level `orderings()` / `aggregate()` are there if you batch by hand.
+
+Wired into `10-Skills/bot-117/scripts/runoff.py`, whose round-1 tie was
+0.42/0.35 — a 0.07 margin, far under the 0.25 the router treats as decidable,
+and exactly the regime where ordering decides the verdict. Three options have
+six orderings, so that call enumerates **all** of them: the exact group
+average, not a sample.
 
 Six orderings of 25 options cost **496 ms in one request** — against ~507 ms for
 a single 255-option call. The batching envelope already paid for this.

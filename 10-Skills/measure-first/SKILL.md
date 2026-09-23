@@ -7,6 +7,10 @@ description: |
   Rule: before building anything non-trivial, run the cheapest experiment that
   could falsify the plan — with the prediction written down FIRST.
 
+  Two standing instructions from the user, in force every session:
+  LOW VERBOSITY — report only what is necessary, no repetition or elaboration.
+  END EVERY SESSION with the recommended prompt for the NEXT build.
+
   Jev chose this over three alternatives at 0.92 (margin 0.84), judged against
   this project's own record of what actually went wrong.
 allowed-tools: Bash Read
@@ -77,3 +81,41 @@ Both found here, both twice-bitten:
 Nothing is banned. But **"this reads better" is not evidence**, and neither is
 "the vendor would say that." Both have been wrong here, in writing, with the
 receipt committed.
+
+---
+
+## Standing instructions from the user
+
+These are not suggestions and they do not expire with the session.
+
+### 1. Low verbosity
+
+Report only what is necessary. No restating the request, no narrating steps
+already visible in the tool calls, no repeating a finding in prose that a table
+already carries. The user is token-sensitive and has said so more than once.
+
+What survives the cut: the verdict, the number behind it, anything falsified,
+and anything that would change what gets built next. What does not: preamble,
+recap, and any sentence whose removal loses no information.
+
+**Terse is not the same as vague.** Cutting the number instead of the padding
+is the failure mode to avoid. "It works" is shorter than the measurement and
+worth much less.
+
+### 2. End every session with the next build's prompt
+
+The last thing in every session is a prompt the user can paste to start the
+next one. Not a summary of what happened — a *runnable instruction* for what
+comes next.
+
+It must carry what a cold session cannot reconstruct:
+
+- **State**: what is built, what is green, what commit and PR it sits on.
+- **The blocker**: what is actually in the way, named specifically.
+- **The next measurement**: what to falsify, and the pre-registered prediction,
+  because a prompt that says "keep building" invites building the wrong thing.
+- **The constraints still in force**: the seven trading rules, paper-only until
+  the gate passes, no key material in any repo.
+
+Write it as an instruction addressed to the next session, in a fenced block so
+it can be copied whole.

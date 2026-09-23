@@ -217,3 +217,180 @@ def test_aggregate_refuses_zero_mass():
 def test_aggregate_refuses_an_empty_batch():
     with pytest.raises(BudgetError, match="nothing to aggregate"):
         aggregate([], ["a", "b"])
+
+
+# --- ask_stable: the round trip ------------------------------------------
+
+@dataclass
+class FakeQuestion:
+    name: str
+    criteria: dict
+    instructions: dict
+
+
+@dataclass
+class FakeResult:
+    answers: dict
+
+
+class FakeAsk:
+    """Records what was sent, and answers with a per-ORDER-dependent bias.
+
+    The bias is the point: it returns a higher probability for whichever label
+    happens to be listed FIRST. That is a caricature of the real order
+    sensitivity measured on 2026-09-22, and it makes the averaging observable.
+    """
+
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, state, questions, **kwargs):
+        self.calls.append((state, questions, kwargs))
+        answers = {}
+        for q in questions:
+            labels = list(q.criteria)
+            first = labels[0]
+            n = len(labels)
+            bonus = 0.30
+            rest = (1.0 - bonus) / n
+            probs = {lab: rest + (bonus if lab == first else 0.0) for lab in labels}
+            answers[q.name] = FakeAnswer(max(probs, key=probs.__getitem__), probs)
+        return FakeResult(answers)
+
+
+def _stable(**kw):
+    from permute import ask_stable
+    ask = FakeAsk()
+    q = FakeQuestion("cause", {"a": "A", "b": "B", "c": "C"}, {"task": "pick"})
+    got = ask_stable({"s": 1}, q, ask=ask, question_cls=FakeQuestion, **kw)
+    return got, ask
+
+
+def test_ask_stable_sends_exactly_one_request():
+    """Batching is what makes this affordable; N requests would not be."""
+    _, ask = _stable(m=6)
+    assert len(ask.calls) == 1
+
+
+def test_ask_stable_sends_one_question_per_ordering():
+    _, ask = _stable(m=6)
+    _, questions, _ = ask.calls[0]
+    assert len(questions) == 6
+    assert len({q.name for q in questions}) == 6
+
+
+def test_ask_stable_sends_every_ordering_with_the_same_option_set():
+    _, ask = _stable(m=6)
+    _, questions, _ = ask.calls[0]
+    assert all(set(q.criteria) == {"a", "b", "c"} for q in questions)
+    # ...and they are genuinely different ORDERS, not the same dict six times.
+    assert len({tuple(q.criteria) for q in questions}) == 6
+
+
+def test_ask_stable_shares_one_state_across_orderings():
+    _, ask = _stable(m=6)
+    state, _, _ = ask.calls[0]
+    assert state == {"s": 1}
+
+
+def test_ask_stable_carries_instructions_to_every_ordering():
+    _, ask = _stable(m=4)
+    _, questions, _ = ask.calls[0]
+    assert all(q.instructions == {"task": "pick"} for q in questions)
+
+
+def test_ask_stable_detects_the_flip_a_first_position_bias_creates():
+    """With a first-position bias and all 6 orderings, every label wins twice."""
+    got, _ = _stable(m=6)
+    assert got.flipped is True
+    assert got.orderings == 6
+    # Averaging over all orderings cancels the bias exactly.
+    assert got.probabilities["a"] == pytest.approx(got.probabilities["b"])
+    assert got.probabilities["c"] == pytest.approx(got.probabilities["a"])
+
+
+def test_ask_stable_at_m1_is_the_canonical_single_call():
+    got, ask = _stable(m=1)
+    _, questions, _ = ask.calls[0]
+    assert len(questions) == 1
+    assert tuple(questions[0].criteria) == ("a", "b", "c")
+    assert got.choice == "a"          # the caller's own first option, unbiased
+    assert got.flipped is False
+
+
+def test_ask_stable_forwards_kwargs_to_ask():
+    from permute import ask_stable
+    ask = FakeAsk()
+    q = FakeQuestion("cause", {"a": "A", "b": "B"}, {})
+    ask_stable({}, q, m=2, ask=ask, question_cls=FakeQuestion, timeout=99)
+    assert ask.calls[0][2]["timeout"] == 99
+
+
+def test_ask_stable_returns_PermutedChoice_not_Answer():
+    """The two carry different KINDS of number and must not be interchangeable.
+
+    `Answer.confidence` is Jev's own confidence; `mean_confidence` is the
+    winner's mean probability. A shared type invites mixing them in one
+    calibration bucket, which measures the mixture rather than the model.
+    """
+    from permute import PermutedChoice
+    got, _ = _stable(m=2)
+    assert isinstance(got, PermutedChoice)
+    assert not hasattr(got, "confidence")
+
+
+def test_ask_stable_refuses_zero_orderings():
+    with pytest.raises(BudgetError):
+        _stable(m=0)
+
+
+def test_ask_stable_refuses_a_batch_over_the_token_ceiling():
+    from permute import ask_stable
+    wide = {f"o{i}": "x" for i in range(200)}
+    q = FakeQuestion("q", wide, {})
+    with pytest.raises(BudgetError, match="safe budget"):
+        ask_stable({}, q, m=11, ask=FakeAsk(), question_cls=FakeQuestion)
+
+
+# --- pass-through questions ----------------------------------------------
+
+def test_extra_questions_ride_the_same_request():
+    """A boolean has no option order to vary, so permuting it is meaningless.
+
+    It still belongs in the SAME request -- one round trip is the entire cost
+    argument for permutation averaging, and a second call would spend it.
+    """
+    from permute import ask_stable
+    ask = FakeAsk()
+    q = FakeQuestion("cause", {"a": "A", "b": "B"}, {})
+    extra = [FakeQuestion("is_blocked", {"yes": "Y", "no": "N"}, {})]
+    got = ask_stable({}, q, m=2, extra=extra, ask=ask, question_cls=FakeQuestion)
+    assert len(ask.calls) == 1
+    _, questions, _ = ask.calls[0]
+    assert len(questions) == 3          # 2 orderings + 1 pass-through
+    assert "is_blocked" in got.extra
+
+
+def test_extra_questions_are_NOT_permuted():
+    from permute import ask_stable
+    ask = FakeAsk()
+    q = FakeQuestion("cause", {"a": "A", "b": "B"}, {})
+    extra = [FakeQuestion("is_blocked", {"yes": "Y", "no": "N"}, {})]
+    ask_stable({}, q, m=2, extra=extra, ask=ask, question_cls=FakeQuestion)
+    _, questions, _ = ask.calls[0]
+    assert sum(1 for x in questions if x.name == "is_blocked") == 1
+
+
+def test_extra_is_empty_when_none_passed():
+    got, _ = _stable(m=2)
+    assert got.extra == {}
+
+
+def test_extra_name_colliding_with_a_generated_ordering_is_refused():
+    """Generated names are derived from the question name; a collision would
+    silently overwrite an ordering's answer and skew the mean."""
+    from permute import ask_stable
+    q = FakeQuestion("cause", {"a": "A", "b": "B"}, {})
+    clash = [FakeQuestion("cause__ord0", {"yes": "Y", "no": "N"}, {})]
+    with pytest.raises(BudgetError, match="collides"):
+        ask_stable({}, q, m=2, extra=clash, ask=FakeAsk(), question_cls=FakeQuestion)

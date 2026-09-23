@@ -169,7 +169,23 @@ swing. That is the opposite direction to a first-position bias, and larger
 than the 17pp seen at width 25. Don't assume which way the bias runs; measure
 it per question shape.
 
-## 8. The wire adapter refuses rather than coerces
+## 8. Speeds are planes too
+
+A fast closed-set model deciding every tick, and a slow model rewriting its
+instructions nightly, are two planes with the same rule as hunt and exec:
+**the revise plane writes proposals and never live config.** A human or a test
+approves. See `10-Skills/reflective-rewrite/`. Its gate refuses model
+approvers, self-approval, stale overwrites and injection-shaped text.
+
+And give the fast model **words, not numbers**. See `10-Skills/state-encoding/`:
+a tested discretiser with hysteresis, and a flip-rate measure in place of a
+guessed word budget.
+
+**No answer means hold.** A timeout or a failed call is UNDECIDED (§6), never
+a default action. Make that the first behaviour that works, before anything
+else does.
+
+## 9. The wire adapter refuses rather than coerces
 
 A malformed answer quietly coerced into a plausible one is worse than an
 error, because the caller acts on it. Refuse: wrong option set; mass not

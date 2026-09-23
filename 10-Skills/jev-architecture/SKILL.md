@@ -147,7 +147,29 @@ at a threshold. Anything between 10% and 90% is an unstable gate.
 Each tier's gate is set on **its own engine's scale** (see §4). One threshold
 shared across a `single` tier and a `permuted` tier is two different gates.
 
-## 7. The wire adapter refuses rather than coerces
+## 7. Paired experiments: one request, one scale, power per arm
+
+Hydra's `permutation-brier-v1` (sealed before its data) is the worked example.
+
+- **Pair from ONE request.** A `CapturingEngine` inside a `PermutedEngine`
+  hands back ordering 0, the canonical order, from the same call as the
+  average. Two separate calls would add call-to-call noise (0.62–0.74 on
+  identical input) to every paired difference.
+- **Compare on one scale.** Both arms forecast P(event), not Jev's
+  `confidence` field, which describes the argmax and sits ~0.1 lower.
+- **Power is per arm.** Three arms per subject means 97 outcomes *across*
+  arms is ~33 subjects, three correlated outcomes counted as independent. The
+  minimum holds within one action. Hydra's status tool had this wrong; it was
+  caught before shipping.
+
+**Measured order bias on a two-option question:** P(retains) came out ≈2×
+higher in the averaged forecast than in the canonical order on every wallet
+(0.30 vs 0.16), meaning the option listed **second** was favoured, a ~0.28
+swing. That is the opposite direction to a first-position bias, and larger
+than the 17pp seen at width 25. Don't assume which way the bias runs; measure
+it per question shape.
+
+## 8. The wire adapter refuses rather than coerces
 
 A malformed answer quietly coerced into a plausible one is worse than an
 error, because the caller acts on it. Refuse: wrong option set; mass not

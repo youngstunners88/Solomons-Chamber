@@ -148,11 +148,17 @@ different times. A single "not ready" hides which one is binding.
 `MIN_RESOLVED = 97` is derived, not chosen: `n ≥ (1.96 / (2·tolerance))²` for a
 ten-point error. Twenty flawless outcomes look like proof and are not.
 
-**This is why shortening the calendar does not help.** Cutting a 30-day
-minimum to 2 moves the calendar check while leaving the sample-size check
-exactly where it was — 2 days will not produce 97 resolved outcomes. The gate
-stays shut and the safety margin is gone. If someone asks for the shorter
-window, say this rather than just editing the constant.
+**Shortening the calendar moves only one of the two.** Cutting 30 days to 2
+leaves the 97-resolved-outcome check exactly where it was.
+
+Hydra/tradecc now run a **2-day window, by the user's explicit decision
+(2026-09-23)**, made after this was raised twice. Their revisit trigger:
+*losing trades on paper*. Recorded beside the constant in `tradecc/core/gate.py`
+and pinned by a test, so any change in either direction is a reviewed edit.
+
+The right way to handle this: raise the consequence once or twice, then build
+what was decided and write the provenance next to it. Don't keep re-arguing,
+and don't silently refuse.
 
 ## Disclose the sampling frame
 
@@ -166,6 +172,7 @@ later.
 
 ## See also
 
+- `10-Skills/outcome-resolution/` — the SECOND write; five silent biases in resolvers.
 - `10-Skills/measure-first/` — the session protocol; pre-register before measuring.
 - `10-Skills/irreversibility-harness/scripts/reconcile.py` — absence detection generally.
 - `references/failure-modes.md` — full transcripts of all four.

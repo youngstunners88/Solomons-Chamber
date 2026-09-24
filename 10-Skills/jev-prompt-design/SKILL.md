@@ -141,6 +141,32 @@ its own most probable option. It has not recurred in 350 calls since. The
 argmax guard ported from `better-call-jev` caught it; a client without one
 would have acted on a choice the model's own distribution contradicted.
 
+## 7. If code uses the number as a forecast, ask a Noul, not a Choice
+
+A Choice's probabilities are sharpened toward its pick. They are not a
+forecast. An independent run, `jev-does-not-play-dice` (MIT, 400 trials,
+jev-1.13.0), found:
+
+- Choice on a hidden fair die reported **82.9%** for a 16.7% event.
+- A document that stated 45% came back as **6.6%**. One that stated 55% came
+  back as **95.9%**.
+- Noul on the same die reported **19.2%**.
+
+Hydra's local run, 83 wallets, is exploratory and not a sealed result. Both
+Choice arms scored a Brier worse than a constant 0.5, with P(retains) around
+0.25 against a real rate of 0.58.
+
+Choose the primitive by what the number is used for:
+
+- **Branching.** Use a Choice and gate on it. The sharpening does no harm.
+- **Scoring with Brier, sizing, or ranking by probability.** Use a Noul whose
+  `true` side says the good thing, word for word as the outcome rule states
+  it. Then measure it against a constant baseline before trusting it.
+
+`confidence` is `(p_max - 1/K)/(1 - 1/K)` (the official adapter). It is a
+statement about the shape of the distribution, not a probability. A Noul has
+no `confidence` field at all. Read `references/ecosystem-2026-09-24.md`.
+
 ## The checklist
 
 Before shipping a `Question`:
@@ -153,6 +179,8 @@ Before shipping a `Question`:
 5. Is the threshold set by **what a wrong answer costs**?
 6. Have you **measured** the change against reviewed examples, rather than
    reasoning about whether it reads better?
+7. If the number is used as a **probability**, is the question a Noul, and
+   does it beat a constant baseline?
 
 Step 6 is the one that would have caught my wrong prediction, and it is the
 one most easily skipped, because the tidier text genuinely reads better.
@@ -161,3 +189,5 @@ one most easily skipped, because the tidier text genuinely reads better.
 
 - `10-Skills/jev-router/` — the client, the gates, and the measured behaviour.
 - `10-Skills/jev-router/evals/RESULTS-2026-09-21.md` — the full run.
+- `references/ecosystem-2026-09-24.md` — six community repos read, with what
+  was taken, what was left, and why.

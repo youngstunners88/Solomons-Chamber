@@ -1,0 +1,90 @@
+name: test
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+# A second push to the same branch makes the first run's answer worthless.
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # The skills here are deliberately standard-library only, so there is no
+      # requirements file to install and nothing to cache. If a skill ever
+      # needs a real dependency, add it here rather than making the whole vault
+      # carry it.
+      - name: Install pytest
+        run: python -m pip install --quiet pytest
+
+      # Every skill keeps its tests in 10-Skills/<name>/tests. Discovering them
+      # rather than listing them means a new skill is covered the day it lands,
+      # without anyone remembering to edit this file.
+      - name: Find skill test suites
+        id: find
+        run: |
+          set -euo pipefail
+          DIRS=$(find 10-Skills -type d -name tests -not -path '*/node_modules/*' | sort | tr '\n' ' ')
+          echo "dirs=${DIRS}" >> "$GITHUB_OUTPUT"
+          echo "Found: ${DIRS:-<none>}"
+
+      # A green tick on a run that collected nothing is worse than no CI at
+      # all: it reports "tests pass" when no test ran. If the layout changes
+      # and the glob above stops matching, this fails loudly instead.
+      - name: Fail if no suites were found
+        if: steps.find.outputs.dirs == ''
+        run: |
+          echo "No 10-Skills/*/tests directories matched."
+          echo "Either the layout changed or the discovery step is broken."
+          echo "A pass here would be a false green, so this fails instead."
+          exit 1
+
+      - name: Run skill tests
+        run: python -m pytest ${{ steps.find.outputs.dirs }} -q
+
+      # Most scripts in this vault are run by hand and have no tests, so a
+      # syntax error can sit unnoticed until someone needs the script. This
+      # will not catch a wrong value, but it catches a file that cannot load.
+      - name: Byte-compile every skill script
+        run: python -m compileall -q 10-Skills
+
+      # The one failure this repo cannot take back. Bot identity keys live in
+      # .env files that .gitignore is supposed to cover; if that ever slips,
+      # the key is public and, for freebots, unrecoverable. Cheap to check.
+      - name: Refuse committed key material
+        run: |
+          set -euo pipefail
+          # Tracked files only: what is committed is what can leak. An
+          # .env.example documents variable NAMES with empty values, so the
+          # pattern below requires a non-empty value after the '='.
+          if git ls-files -z | grep -zE '(^|/)\.env$|(^|/)\.token$' | tr '\0' '\n' | grep . ; then
+            echo "A .env or .token file is committed. These hold private keys."
+            exit 1
+          fi
+          # Character classes break the literals up so this workflow does not
+          # match its own patterns when it is itself part of a diff.
+          PATTERN='(BOTMESH[_]PRIVKEY[[:space:]]*=[[:space:]]*.+|sk-or-v1-[A-Za-z0-9]{16,}|sk-[A-Za-z0-9]{32,}|BEGIN [A-Z ]*PRIVATE[ ]KEY)'
+          if git grep -nIE "$PATTERN" -- . ':!.github/workflows/test.yml' ; then
+            echo "Possible private key or API key in a tracked file."
+            exit 1
+          fi
+          echo "No committed key material found."

@@ -1,0 +1,12 @@
+{
+ "primary": "WORK_MAX",
+ "primary_margin": 0.07,
+ "market_has_demand": "NO",
+ "selling_explains_the_top": "NO",
+ "risk": "no risk",
+ "concentration": "no risk",
+ "first_move": "EARN_A_FLOAT",
+ "negotiation_pays": "NO",
+ "diversify": "UNDECIDED",
+ "recognition_lever": "MANY_SMALL"
+}
